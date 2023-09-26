@@ -12,4 +12,4 @@ COPY . .
 RUN pip install
 
 # 设置默认的命令，即启动应用程序
-CMD ["app.main:app.py", "--host", "0.0.0.0", "--port", "7860"]
+CMD ["python", "app.py", "--host", "0.0.0.0", "--port", "7860"]
