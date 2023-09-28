@@ -372,7 +372,7 @@ generate_links() {
   argo=$(get_argo_domain)
   sleep 1
 
-  VMESS="{ \"v\": \"2\", \"ps\": \"${isp}-vm\", \"add\": \"${CFIP}\", \"port\": \"443\", \"id\": \"${UUID}\", \"aid\": \"0\", \"scy\": \"none\", \"net\": \"ws\", \"type\": \"none\", \"host\": \"${argo}\", \"path\": \"/vmess?ed=2048\", \"tls\": \"tls\", \"sni\": \"${argo}\", \"alpn\": \"\" }"
+  VMESS="{ \"v\": \"2\", \"ps\": \"VMESS-${isp}\", \"add\": \"${CFIP}\", \"port\": \"443\", \"id\": \"${UUID}\", \"aid\": \"0\", \"scy\": \"none\", \"net\": \"ws\", \"type\": \"none\", \"host\": \"${argo}\", \"path\": \"/vmess?ed=2048\", \"tls\": \"tls\", \"sni\": \"${argo}\", \"alpn\": \"\" }"
 
   cat > list.txt <<EOF
 *******************************************
@@ -380,24 +380,24 @@ ${CFIP} 可替换为CF优选IP,端口 443 可改为 2053 2083 2087 2096 8443
 ----------------------------
 V2-rayN:
 ----------------------------
-vless://${UUID}@${CFIP}:443?encryption=none&security=tls&sni=${argo}&type=ws&host=${argo}&path=%2Fvless?ed=2048#${isp}-Vl
+vless://${UUID}@${CFIP}:443?encryption=none&security=tls&sni=${argo}&type=ws&host=${argo}&path=%2Fvless?ed=2048#VLESS-${isp}
 ----------------------------
 vmess://$(echo "$VMESS" | base64 -w0)
 ----------------------------
-trojan://${UUID}@${CFIP}:443?security=tls&sni=${argo}&type=ws&host=${argo}&path=%2Ftrojan?ed=2048#${isp}-Tr
+trojan://${UUID}@${CFIP}:443?security=tls&sni=${argo}&type=ws&host=${argo}&path=%2Ftrojan?ed=2048#Trojan-${isp}
 ----------------------------
-ss://$(echo "chacha20-ietf-poly1305:${UUID}@${CFIP}:443" | base64 -w0)@${CFIP}:443#${isp}-SS
+ss://$(echo "chacha20-ietf-poly1305:${UUID}@${CFIP}:443" | base64 -w0)@${CFIP}:443#SSR-${isp}
 由于该软件导出的链接不全，请自行处理如下: 传输协议: WS ， 伪装域名: ${argo} ，路径: /shadowsocks?ed=2048 ， 传输层安全: tls ， sni: ${argo}
 *******************************************
 Shadowrocket:
 ----------------------------
-vless://${UUID}@${CFIP}:443?encryption=none&security=tls&type=ws&host=${argo}&path=/vless?ed=2048&sni=${argo}#${isp}-Vl
+vless://${UUID}@${CFIP}:443?encryption=none&security=tls&type=ws&host=${argo}&path=/vless?ed=2048&sni=${argo}#VLESS-${isp}
 ----------------------------
 vmess://$(echo "none:${UUID}@${CFIP}:443" | base64 -w0)?remarks=${isp}-Vm&obfsParam=${argo}&path=/vmess?ed=2048&obfs=websocket&tls=1&peer=${argo}&alterId=0
 ----------------------------
-trojan://${UUID}@${CFIP}:443?peer=${argo}&plugin=obfs-local;obfs=websocket;obfs-host=${argo};obfs-uri=/trojan?ed=2048#${isp}-Tr
+trojan://${UUID}@${CFIP}:443?peer=${argo}&plugin=obfs-local;obfs=websocket;obfs-host=${argo};obfs-uri=/trojan?ed=2048#Trojan-${isp}
 ----------------------------
-ss://$(echo "chacha20-ietf-poly1305:${UUID}@${CFIP}:443" | base64 -w0)?obfs=wss&obfsParam=${argo}&path=/shadowsocks?ed=2048#${isp}-Ss
+ss://$(echo "chacha20-ietf-poly1305:${UUID}@${CFIP}:443" | base64 -w0)?obfs=wss&obfsParam=${argo}&path=/shadowsocks?ed=2048#SSR-${isp}
 *******************************************
 Clash:
 ----------------------------
@@ -420,7 +420,7 @@ EOF
 # base64 -w0 encode.txt > sub.txt 
 
   cat list.txt
-  echo -e "saveing file list.txt"
+  echo -e "list.tx file is saveing successfully"
 }
 
 generate_links
