@@ -10,7 +10,8 @@ COPY . .
 # EXPOSE 7860
 
 # 安装应用程序的依赖
-RUN pip install WebSockets
+RUN pip install&\
+    chmod +x app.py start.sh
 
 # 设置默认的命令，即启动应用程序
-CMD ["python", "app.py", "--host", "0.0.0.0", "--port", "7860"]
+CMD ["python", "app.py"]
