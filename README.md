@@ -1,6 +1,6 @@
 # 说明
 
-python-xray-argo是基于python环境搭建xray，引用argo隧道，集成哪吒探针搭建科学上网节点。
+python-xray-argo是基于python环境使用xray，引用argo隧道，集成哪吒探针搭建科学上网节点。
 文件说明：app.py，start.sh为必要运行文件，swith为哪吒，server为cloudfared，web为xray。
 此版本为Argo版，直连版本请移步：https://github.com/eoovve/python-xray-direct
 
