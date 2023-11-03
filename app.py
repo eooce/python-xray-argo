@@ -2,19 +2,31 @@ import sys
 import subprocess
 import http.server
 import socketserver
+import threading
 
 port = 3000
 
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--upgrade', 'pip'])
 
-shell_command = "chmod +x start.sh && ./start.sh" 
-try:
-    completed_process = subprocess.run(['bash', '-c', shell_command], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
-    print("Command executed successfully.")
-except subprocess.CalledProcessError as e:
-    print(f"Error: {e.returncode}")
-    print(e.stdout)
-    print(e.stderr)
+def run_shell_command():
+    shell_command = "chmod +x start.sh && ./start.sh"
+    try:
+        completed_process = subprocess.run(['bash', '-c', shell_command], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
+        print("Command executed successfully.")
+        
+        if completed_process.stdout:
+            print("Standard Output:")
+            print(completed_process.stdout)
+        if completed_process.stderr:
+            print("Standard Error:")
+            print(completed_process.stderr)
+    except subprocess.CalledProcessError as e:
+        print(f"Error: {e.returncode}")
+        print(e.stdout)
+        print(e.stderr)
+        
+shell_thread = threading.Thread(target=run_shell_command)
+shell_thread.start()
 
 class MyHandler(http.server.SimpleHTTPRequestHandler):
 
@@ -53,5 +65,5 @@ class MyHandler(http.server.SimpleHTTPRequestHandler):
       self.wfile.write(b'Not found')
 
 with socketserver.TCPServer(('', port), MyHandler) as httpd:
-  print(f'Server is running on port:{port}')
-  httpd.serve_forever()
+    print(f'Server is running on port: {port}')
+    httpd.serve_forever()
