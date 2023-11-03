@@ -1,126 +1,29 @@
-#!/usr/bin/env bash
-NEZHA_SERVER=${NEZHA_SERVER:-'aa.bbb.com'}
-NEZHA_PORT=${NEZHA_PORT:-'5555'}
-NEZHA_KEY=${NEZHA_KEY:-'jZ79uoWGTCMpJ7hdfd'}
-TLS=${TLS:-'0'}
-ARGO_DOMAIN=${ARGO_DOMAIN:-''}
-ARGO_AUTH=${ARGO_AUTH:-''}
-WSPATH=${WSPATH:-'argo'}
-UUID=${UUID:-'de04add9-5c68-8bab-870c-08cd5320df18'}
-CFIP=${CFIP:-'skk.moe'}
+#!/bin/bash
+export UUID=${UUID:-'de823d1f-9a68-4f79-b82e-0267132b6a99'}
+export NEZHA_SERVER=${NEZHA_SERVER:-'nz.abc.com'}
+export NEZHA_PORT=${NEZHA_PORT:-'5555'}
+export NEZHA_KEY=${NEZHA_KEY:-'a0nmPqZWggHabcdefg'}
+export NEZHA_TLS=${NEZHA_TLS:-''}
+export ARGO_DOMAIN=${ARGO_DOMAIN:-''}
+export ARGO_TOK=${ARGO_TOK:-''}
+export CFIP=${CFIP:-'skk.moe'}
+export NAME=${NAME:-'Python'}
+export FILE_PATH=${FILE_PATH:-'./temp'}
 
-if [ "$TLS" -eq 0 ]; then
-  NEZHA_TLS=''
-elif [ "$TLS" -eq 1 ]; then
-  NEZHA_TLS='--tls'
+if [ ! -d "${FILE_PATH}" ]; then
+    mkdir ${FILE_PATH}
 fi
 
-
-set_download_url() {
-  local program_name="$1"
-  local default_url="$2"
-  local x64_url="$3"
-
-  if [ "$(uname -m)" = "x86_64" ] || [ "$(uname -m)" = "amd64" ] || [ "$(uname -m)" = "x64" ]; then
-    download_url="$x64_url"
-  else
-    download_url="$default_url"
-  fi
+#清理历史运行文件
+cleanup_oldfiles() {
+  rm -rf ${FILE_PATH}/boot.log ${FILE_PATH}/list.txt ${FILE_PATH}/sub.txt ${FILE_PATH}/config.json nohup.out
 }
+cleanup_oldfiles
+sleep 2
 
-download_program() {
-  local program_name="$1"
-  local default_url="$2"
-  local x64_url="$3"
-
-  set_download_url "$program_name" "$default_url" "$x64_url"
-
-  if [ ! -f "$program_name" ]; then
-    if [ -n "$download_url" ]; then
-      echo "Downloading $program_name..."
-      curl -sSL "$download_url" -o "$program_name"
-      dd if=/dev/urandom bs=1024 count=1024 | base64 >> "$program_name"
-      echo "Downloaded $program_name"
-    else
-      echo "Skipping download for $program_name"
-    fi
-  else
-    dd if=/dev/urandom bs=1024 count=1024 | base64 >> "$program_name"
-    echo "$program_name already exists, skipping download"
-  fi
-}
-
-
-download_program "swith" "https://github.com/fscarmen2/X-for-Botshard-ARM/raw/main/nezha-agent" "https://github.com/fscarmen2/X-for-Stozu/raw/main/nezha-agent"
-sleep 6
-
-download_program "web" "https://github.com/fscarmen2/X-for-Botshard-ARM/raw/main/web.js" "https://github.com/fscarmen2/X-for-Stozu/raw/main/web.js"
-sleep 6
-
-download_program "server" "https://github.com/cloudflare/cloudflared/releases/download/2023.8.0/cloudflared-linux-arm64" "https://github.com/cloudflare/cloudflared/releases/download/2023.8.0/cloudflared-linux-amd64"
-sleep 6
-
-cleanup_files() {
-  rm -rf boot.log list.txt
-}
-
-argo_type() {
-  if [[ -z $ARGO_AUTH || -z $ARGO_DOMAIN ]]; then
-    echo "ARGO_AUTH or ARGO_DOMAIN is empty, use interim Tunnels"
-    return
-  fi
-
-  if [[ $ARGO_AUTH =~ TunnelSecret ]]; then
-    echo $ARGO_AUTH > tunnel.json
-    cat > tunnel.yml << EOF
-tunnel: $(cut -d\" -f12 <<< $ARGO_AUTH)
-credentials-file: ./tunnel.json
-protocol: http2
-
-ingress:
-  - hostname: $ARGO_DOMAIN
-    service: http://localhost:8080
-    originRequest:
-      noTLSVerify: true
-  - service: http_status:404
-EOF
-  else
-    echo "ARGO_AUTH Mismatch TunnelSecret"
-  fi
-}
-
-
-run() {
-  if [ -e swith ]; then
-  chmod 775 swith
-    if [ -n "$NEZHA_SERVER" ] && [ -n "$NEZHA_PORT" ] && [ -n "$NEZHA_KEY" ]; then
-    nohup ./swith -s ${NEZHA_SERVER}:${NEZHA_PORT} -p ${NEZHA_KEY} ${NEZHA_TLS} >/dev/null 2>&1 &
-    keep1="nohup ./swith -s ${NEZHA_SERVER}:${NEZHA_PORT} -p ${NEZHA_KEY} ${NEZHA_TLS} >/dev/null 2>&1 &"
-    fi
-  fi
-
-  if [ -e web ]; then
-  chmod 775 web
-    nohup ./web -c ./config.json >/dev/null 2>&1 &
-    keep2="nohup ./web -c ./config.json >/dev/null 2>&1 &"
-  fi
-
-  if [ -e server ]; then
-  chmod 775 server
-if [[ $ARGO_AUTH =~ ^[A-Z0-9a-z=]{120,250}$ ]]; then
-  args="tunnel --edge-ip-version auto --no-autoupdate --protocol http2 --logfile boot.log --loglevel info run --token ${ARGO_AUTH}"
-elif [[ $ARGO_AUTH =~ TunnelSecret ]]; then
-  args="tunnel --edge-ip-version auto --config tunnel.yml run"
-else
-  args="tunnel --edge-ip-version auto --no-autoupdate --protocol http2 --logfile boot.log --loglevel info --url http://localhost:8080"
-fi
-nohup ./server $args >/dev/null 2>&1 &
-keep3="nohup ./server $args >/dev/null 2>&1 &"
-  fi
-} 
-
+#生成xr-ay配置文件
 generate_config() {
-  cat > config.json << EOF
+  cat > ${FILE_PATH}/config.json << EOF
 {
     "log":{
         "access":"/dev/null",
@@ -347,144 +250,127 @@ generate_config() {
 }
 EOF
 }
-
-cleanup_files
-sleep 2
 generate_config
 sleep 3
-argo_type
-sleep 3
-run
-sleep 15
 
-function get_argo_domain() {
-  if [[ -n $ARGO_AUTH ]]; then
-    echo "$ARGO_DOMAIN"
+# 下载依赖文件
+set_download_url() {
+  local program_name="$1"
+  local default_url="$2"
+  local x64_url="$3"
+
+  if [ "$(uname -m)" = "x86_64" ] || [ "$(uname -m)" = "amd64" ] || [ "$(uname -m)" = "x64" ]; then
+    download_url="$x64_url"
   else
-    cat boot.log | grep trycloudflare.com | awk 'NR==2{print}' | awk -F// '{print $2}' | awk '{print $1}'
+    download_url="$default_url"
   fi
 }
 
-isp=$(curl -s https://speed.cloudflare.com/meta | awk -F\" '{print $26"-"$18"-"$30}' | sed -e 's/ /_/g')
-sleep 3
+download_program() {
+  local program_name="$1"
+  local default_url="$2"
+  local x64_url="$3"
 
-generate_links() {
-  argo=$(get_argo_domain)
-  sleep 1
+  set_download_url "$program_name" "$default_url" "$x64_url"
 
-  VMESS="{ \"v\": \"2\", \"ps\": \"VMESS-${isp}\", \"add\": \"${CFIP}\", \"port\": \"443\", \"id\": \"${UUID}\", \"aid\": \"0\", \"scy\": \"none\", \"net\": \"ws\", \"type\": \"none\", \"host\": \"${argo}\", \"path\": \"/vmess?ed=2048\", \"tls\": \"tls\", \"sni\": \"${argo}\", \"alpn\": \"\" }"
+  if [ ! -f "$program_name" ]; then
+    if [ -n "$download_url" ]; then
+      curl -sSL -C - "$download_url" -o "$program_name" > /dev/null 2>&1
+      if [ $? -eq 33 ]; then
+        echo "Resuming download $program_name..."
+        curl -sSL "$download_url" -o "$program_name" > /dev/null 2>&1
+      fi
+      if [ $? -eq 0 ]; then
+        dd if=/dev/urandom bs=1024 count=1024 | base64 >> "$program_name" > /dev/null 2>&1
+        echo "$program_name download finished"
+      else
+        echo "Failed to download $program_name"
+      fi
+    else
+      echo "Skipping download $program_name"
+    fi
+  else
+    dd if=/dev/urandom bs=1024 count=1024 | base64 >> "$program_name" > /dev/null 2>&1
+    echo "$program_name already exists, skipping download"
+  fi
+}
 
-  cat > list.txt <<EOF
-*******************************************
-${CFIP} 可替换为CF优选IP,端口 443 可改为 2053 2083 2087 2096 8443
-----------------------------
-V2-rayN:
-----------------------------
-vless://${UUID}@${CFIP}:443?encryption=none&security=tls&sni=${argo}&type=ws&host=${argo}&path=%2Fvless?ed=2048#VLESS-${isp}
-----------------------------
-vmess://$(echo "$VMESS" | base64 -w0)
-----------------------------
-trojan://${UUID}@${CFIP}:443?security=tls&sni=${argo}&type=ws&host=${argo}&path=%2Ftrojan?ed=2048#Trojan-${isp}
-----------------------------
-ss://$(echo "chacha20-ietf-poly1305:${UUID}@${CFIP}:443" | base64 -w0)@${CFIP}:443#SSR-${isp}
-由于该软件导出的链接不全，请自行处理如下: 传输协议: WS ， 伪装域名: ${argo} ，路径: /shadowsocks?ed=2048 ， 传输层安全: tls ， sni: ${argo}
-*******************************************
-Shadowrocket:
-----------------------------
-vless://${UUID}@${CFIP}:443?encryption=none&security=tls&type=ws&host=${argo}&path=/vless?ed=2048&sni=${argo}#VLESS-${isp}
-----------------------------
-vmess://$(echo "none:${UUID}@${CFIP}:443" | base64 -w0)?remarks=${isp}-Vm&obfsParam=${argo}&path=/vmess?ed=2048&obfs=websocket&tls=1&peer=${argo}&alterId=0
-----------------------------
-trojan://${UUID}@${CFIP}:443?peer=${argo}&plugin=obfs-local;obfs=websocket;obfs-host=${argo};obfs-uri=/trojan?ed=2048#Trojan-${isp}
-----------------------------
-ss://$(echo "chacha20-ietf-poly1305:${UUID}@${CFIP}:443" | base64 -w0)?obfs=wss&obfsParam=${argo}&path=/shadowsocks?ed=2048#SSR-${isp}
-*******************************************
-Clash:
-----------------------------
-- {name: ${isp}-Vless, type: vless, server: ${CFIP}, port: 443, uuid: ${UUID}, tls: true, servername: ${argo}, skip-cert-verify: false, network: ws, ws-opts: {path: /vless?ed=2048, headers: { Host: ${argo}}}, udp: true}
-----------------------------
-- {name: ${isp}-Vmess, type: vmess, server: ${CFIP}, port: 443, uuid: ${UUID}, alterId: 0, cipher: none, tls: true, skip-cert-verify: true, network: ws, ws-opts: {path: /vmess?ed=2048, headers: {Host: ${argo}}}, udp: true}
-----------------------------
-- {name: ${isp}-Trojan, type: trojan, server: ${CFIP}, port: 443, password: ${UUID}, udp: true, tls: true, sni: ${argo}, skip-cert-verify: false, network: ws, ws-opts: { path: /trojan?ed=2048, headers: { Host: ${argo} } } }
-----------------------------
-- {name: ${isp}-Shadowsocks, type: ss, server: ${CFIP}, port: 443, cipher: chacha20-ietf-poly1305, password: ${UUID}, plugin: v2ray-plugin, plugin-opts: { mode: websocket, host: ${argo}, path: /shadowsocks?ed=2048, tls: true, skip-cert-verify: false, mux: false } }
-*******************************************
+download_program "${FILE_PATH}/swith" "https://github.com/eoovve/test/releases/download/ARM/swith" "https://github.com/eoovve/test/raw/main/swith"
+sleep 5
+
+download_program "${FILE_PATH}/web" "https://github.com/eoovve/test/releases/download/ARM/web" "https://github.com/eoovve/test/raw/main/web"
+sleep 5
+
+download_program "${FILE_PATH}/server" "https://github.com/cloudflare/cloudflared/releases/download/2023.8.0/cloudflared-linux-arm64" "https://github.com/cloudflare/cloudflared/releases/download/2023.8.0/cloudflared-linux-amd64"
+sleep 5
+
+# 运行ne-zha
+run_swith() {
+  chmod 755 ${FILE_PATH}/swith
+  [ "${NEZHA_TLS}" = "1" ] && NEZHA_TLS='--tls'
+  nohup ${FILE_PATH}/swith -s ${NEZHA_SERVER}:${NEZHA_PORT} -p ${NEZHA_KEY} ${NEZHA_TLS} >/dev/null 2>&1 &
+}
+run_swith
+sleep 2
+
+# 运行xr-ay
+run_web() {
+  chmod 755 ${FILE_PATH}/web
+  nohup ${FILE_PATH}/web -c ${FILE_PATH}/config.json >/dev/null 2>&1 &
+}
+run_web
+sleep 2
+
+# 运行argo
+run_argo() {
+chmod 755 ${FILE_PATH}/server
+if [[ -n "${ARGO_TOK}" ]]; then
+ARGO_TOK=$(echo ${ARGO_TOK} | sed 's@cloudflared.exe service install ey@ey@g')
+    if [[ "${ARGO_TOK}" =~ TunnelSecret ]]; then
+      echo "${ARGO_TOK}" | sed 's@{@{"@g;s@[,:]@"\0"@g;s@}@"}@g' > ${FILE_PATH}/tunnel.json
+      cat > ${FILE_PATH}/tunnel.yml << EOF
+tunnel: $(sed "s@.*TunnelID:\(.*\)}@\1@g" <<< "${ARGO_TOK}")
+credentials-file: ${FILE_PATH}/tunnel.json
+protocol: http2
+
+ingress:
+  - hostname: $ARGO_DOMAIN
+    service: http://localhost:8080
 EOF
-
-#   cat > encode.txt <<EOF
-# vless://${UUID}@${CFIP}:443?encryption=none&security=tls&sni=${argo}&type=ws&host=${argo}&path=%2Fvless?ed=2048#${isp}-Vl
-# vmess://$(echo "$VMESS" | base64 -w0)
-# trojan://${UUID}@${CFIP}:443?security=tls&sni=${argo}&type=ws&host=${argo}&path=%2Ftrojan?ed=2048#${isp}-Tr
-# EOF
-
-# base64 -w0 encode.txt > sub.txt 
-
-  cat list.txt
-  echo -e "list.tx file is saveing successfully"
-}
-
-generate_links
-
-function start_swith_program() {
-if [ -n "$keep1" ]; then
-  if [ -z "$pid" ]; then
-    echo "course'$program'Not running, starting..."
-    eval "$command"
-  else
-    echo "course'$program'running，PID: $pid"
-  fi
+      cat >> ${FILE_PATH}/tunnel.yml << EOF
+  - service: http_status:404
+EOF
+      nohup ${FILE_PATH}/server tunnel --edge-ip-version auto --config ${FILE_PATH}/tunnel.yml run >/dev/null 2>&1 &
+    elif [[ ${ARGO_TOK} =~ ^[A-Z0-9a-z=]{120,250}$ ]]; then
+      nohup ${FILE_PATH}/server tunnel --edge-ip-version auto --protocol http2 run --token ${ARGO_TOK} >/dev/null 2>&1 &
+    fi
 else
-  echo "course'$program'No need"
+ nohup ${FILE_PATH}/server tunnel --edge-ip-version auto --no-autoupdate --protocol http2 --logfile ${FILE_PATH}/boot.log --loglevel info --url http://localhost:8080 2>/dev/null 2>&1 &
+ sleep 5
+ local LOCALHOST=$(ss -nltp | grep '"${FILE_PATH}/server"' | awk '{print $4}')
+ export ARGO_DOMAIN=$(cat ${FILE_PATH}/boot.log | grep -o "info.*https://.*trycloudflare.com" | sed "s@.*https://@@g" | tail -n 1)
 fi
 }
+run_argo
+sleep 1
 
-function start_web_program() {
-  if [ -z "$pid" ]; then
-    echo "course'$program'Not running, starting..."
-    eval "$command"
-  else
-    echo "course'$program'running，PID: $pid"
-  fi
+#生成list和sub
+generate_links() {
+  isp=$(curl -s https://speed.cloudflare.com/meta | awk -F\" '{print $26"-"$18"-"$30}' | sed -e 's/ /_/g')
+  sleep 2
+    cat > ${FILE_PATH}/list.txt <<EOF
+vless://${UUID}@${CFIP}:443?encryption=none&security=tls&sni=${ARGO_DOMAIN}&type=ws&host=${ARGO_DOMAIN}&path=%2Fvless?ed=2048#${NAME}-${isp}
+EOF
+    cat ${FILE_PATH}/list.txt
+base64 -w0 ${FILE_PATH}/list.txt > ${FILE_PATH}/sub.txt 
+  echo -e "files saved successfully "
 }
+generate_links
 
-function start_server_program() {
-  if [ -z "$pid" ]; then
-    echo "'$program'Not running, starting..."
-    cleanup_files
-    sleep 2
-    eval "$command"
-    sleep 5
-    generate_links
-    sleep 3
-  else
-    echo "course'$program'running，PID: $pid"
-  fi
+cleanup_files() {
+  sleep 10  
+  rm -rf ${FILE_PATH}/boot.log ${FILE_PATH}/list.txt ${FILE_PATH}/config.json nohup.out
 }
+cleanup_files
 
-function start_program() {
-  local program=$1
-  local command=$2
-
-  pid=$(pidof "$program")
-
-  if [ "$program" = "swith" ]; then
-    start_swith_program
-  elif [ "$program" = "web" ]; then
-    start_web_program
-  elif [ "$program" = "server" ]; then
-    start_server_program
-  fi
-}
-
-programs=("swith" "web" "server")
-commands=("$keep1" "$keep2" "$keep3")
-
-while true; do
-  for ((i=0; i<${#programs[@]}; i++)); do
-    program=${programs[i]}
-    command=${commands[i]}
-
-    start_program "$program" "$command"
-  done
-  sleep 180
-done
+tail -f /dev/null
