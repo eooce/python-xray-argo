@@ -2,12 +2,11 @@
 export UUID=${UUID:-'de823d1f-9a68-4f79-b82e-0267132b6a99'}
 export NEZHA_SERVER=${NEZHA_SERVER:-'nz.abc.com'}
 export NEZHA_PORT=${NEZHA_PORT:-'5555'}
-export NEZHA_KEY=${NEZHA_KEY:-'a0nmPqZWggHabcdefg'}
-export NEZHA_TLS=${NEZHA_TLS:-''}
+export NEZHA_KEY=${NEZHA_KEY:-'eOLJC0tJpf8abcdefg'}
 export ARGO_DOMAIN=${ARGO_DOMAIN:-''}
 export ARGO_TOK=${ARGO_TOK:-''}
 export CFIP=${CFIP:-'skk.moe'}
-export NAME=${NAME:-'Python'}
+export NAME=${NAME:-'ABCD'}
 export FILE_PATH=${FILE_PATH:-'./temp'}
 
 if [ ! -d "${FILE_PATH}" ]; then
@@ -16,7 +15,7 @@ fi
 
 #清理历史运行文件
 cleanup_oldfiles() {
-  rm -rf ${FILE_PATH}/boot.log ${FILE_PATH}/list.txt ${FILE_PATH}/sub.txt ${FILE_PATH}/config.json nohup.out
+  rm -rf ${FILE_PATH}/boot.log ${FILE_PATH}/sub.txt 
 }
 cleanup_oldfiles
 sleep 2
@@ -301,13 +300,17 @@ sleep 5
 download_program "${FILE_PATH}/web" "https://github.com/eoovve/test/releases/download/ARM/web" "https://github.com/eoovve/test/raw/main/web"
 sleep 5
 
-download_program "${FILE_PATH}/server" "https://github.com/cloudflare/cloudflared/releases/download/2023.8.0/cloudflared-linux-arm64" "https://github.com/cloudflare/cloudflared/releases/download/2023.8.0/cloudflared-linux-amd64"
+download_program "${FILE_PATH}/server" "https://github.com/eoovve/test/releases/download/ARM/server" "https://github.com/eoovve/test/raw/main/server"
 sleep 5
 
 # 运行ne-zha
 run_swith() {
   chmod 755 ${FILE_PATH}/swith
-  [ "${NEZHA_TLS}" = "1" ] && NEZHA_TLS='--tls'
+  if [ "$NEZHA_PORT" = "443" ]; then
+    NEZHA_TLS="--tls"
+  else
+    NEZHA_TLS=""
+  fi
   nohup ${FILE_PATH}/swith -s ${NEZHA_SERVER}:${NEZHA_PORT} -p ${NEZHA_KEY} ${NEZHA_TLS} >/dev/null 2>&1 &
 }
 run_swith
@@ -345,9 +348,8 @@ EOF
       nohup ${FILE_PATH}/server tunnel --edge-ip-version auto --protocol http2 run --token ${ARGO_TOK} >/dev/null 2>&1 &
     fi
 else
- nohup ${FILE_PATH}/server tunnel --edge-ip-version auto --no-autoupdate --protocol http2 --logfile ${FILE_PATH}/boot.log --loglevel info --url http://localhost:8080 2>/dev/null 2>&1 &
+ nohup ${FILE_PATH}/server tunnel --edge-ip-version auto --no-autoupdate --protocol http2 --logfile ${FILE_PATH}/boot.log --loglevel info --url http://localhost:8080 >/dev/null 2>&1 &
  sleep 5
- local LOCALHOST=$(ss -nltp | grep '"${FILE_PATH}/server"' | awk '{print $4}')
  export ARGO_DOMAIN=$(cat ${FILE_PATH}/boot.log | grep -o "info.*https://.*trycloudflare.com" | sed "s@.*https://@@g" | tail -n 1)
 fi
 }
@@ -356,21 +358,27 @@ sleep 1
 
 #生成list和sub
 generate_links() {
-  isp=$(curl -s https://speed.cloudflare.com/meta | awk -F\" '{print $26"-"$18"-"$30}' | sed -e 's/ /_/g')
+  isp=$(curl -s https://speed.cloudflare.com/meta | awk -F\" '{print $26"-"$18}' | sed -e 's/ /_/g')
   sleep 2
-    cat > ${FILE_PATH}/list.txt <<EOF
+  
+  VMESS="{ \"v\": \"2\", \"ps\": \"${NAME}-${isp}\", \"add\": \"${CFIP}\", \"port\": \"443\", \"id\": \"${UUID}\", \"aid\": \"0\", \"scy\": \"none\", \"net\": \"ws\", \"type\": \"none\", \"host\": \"${ARGO_DOMAIN}\", \"path\": \"/vmess?ed=2048\", \"tls\": \"tls\", \"sni\": \"${ARGO_DOMAIN}\", \"alpn\": \"\" }"
+
+  cat > ${FILE_PATH}/list.txt <<EOF
 vless://${UUID}@${CFIP}:443?encryption=none&security=tls&sni=${ARGO_DOMAIN}&type=ws&host=${ARGO_DOMAIN}&path=%2Fvless?ed=2048#${NAME}-${isp}
+
+vmess://$(echo "$VMESS" | base64 -w0)
+
+trojan://${UUID}@${CFIP}:443?security=tls&sni=${ARGO_DOMAIN}&type=ws&host=${ARGO_DOMAIN}&path=%2Ftrojan?ed=2048#${NAME}-${isp}
 EOF
-    cat ${FILE_PATH}/list.txt
-base64 -w0 ${FILE_PATH}/list.txt > ${FILE_PATH}/sub.txt 
-  echo -e "files saved successfully "
+
+  base64 -w0 ${FILE_PATH}/list.txt > ${FILE_PATH}/sub.txt
+  cat ${FILE_PATH}/sub.txt
+
+  echo -e "\nFile saved successfully"
+  sleep 10
+
+  rm ${FILE_PATH}/list.txt ${FILE_PATH}/boot.log ${FILE_PATH}/config.json
 }
 generate_links
-
-cleanup_files() {
-  sleep 10  
-  rm -rf ${FILE_PATH}/boot.log ${FILE_PATH}/list.txt ${FILE_PATH}/config.json nohup.out
-}
-cleanup_files
 
 tail -f /dev/null
