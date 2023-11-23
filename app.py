@@ -4,7 +4,7 @@ import http.server
 import socketserver
 
 # 定义端口
-port = 3000
+port = os.environ.get('PORT', '3000')
 
 # 升级pip到最新版本
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--upgrade', 'pip'])
