@@ -380,5 +380,3 @@ EOF
   rm ${FILE_PATH}/list.txt ${FILE_PATH}/boot.log ${FILE_PATH}/config.json
 }
 generate_links
-
-tail -f /dev/null
