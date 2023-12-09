@@ -5,7 +5,7 @@ export NEZHA_PORT=${NEZHA_PORT:-'5555'}
 export NEZHA_KEY=${NEZHA_KEY:-'eOLJC0tJpf8abcdefg'}
 export ARGO_DOMAIN=${ARGO_DOMAIN:-''}
 export ARGO_TOK=${ARGO_TOK:-''}
-export CFIP=${CFIP:-'skk.moe'}
+export CFIP=${CFIP:-'government.se'}
 export NAME=${NAME:-'ABCD'}
 export FILE_PATH=${FILE_PATH:-'./temp'}
 
