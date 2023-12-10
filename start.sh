@@ -1,12 +1,12 @@
 #!/bin/bash
-export UUID=${UUID:-'de823d1f-9a68-4f79-b82e-0267132b6a99'}
-export NEZHA_SERVER=${NEZHA_SERVER:-'nz.f4i.cn'}
-export NEZHA_PORT=${NEZHA_PORT:-'5555'}   # 哪吒端口为443时开启tls
-export NEZHA_KEY=${NEZHA_KEY:-'MMhhCCI8JfwXMDC0ke'}
+export UUID=${UUID:-'re823d1f-9a68-4f79-b82e-0267132b6a5d'}
+export NEZHA_SERVER=${NEZHA_SERVER:-'nz.abcd.com'}
+export NEZHA_PORT=${NEZHA_PORT:-'5555'}       # 哪吒端口为443时开启tls
+export NEZHA_KEY=${NEZHA_KEY:-''}            # 哪吒三个变量不全不运行
 export ARGO_DOMAIN=${ARGO_DOMAIN:-''}
 export ARGO_AUTH=${ARGO_AUTH:-''}
-export NAME=${NAME:-'MC'}
-export CFIP=${CFIP:-'testhk.migoo.eu.org'}
+export NAME=${NAME:-'Python'}
+export CFIP=${CFIP:-'government.se'}
 export FILE_PATH=${FILE_PATH:-'./temp'}
 export ARGO_PORT=${ARGO_PORT:-'8001'}  # argo隧道端口，若使用固定隧道token请改回8080或CF后台改为与这里对应
 
