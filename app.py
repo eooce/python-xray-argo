@@ -1,31 +1,18 @@
-import os
 import sys
+import os
 import subprocess
 import http.server
 import socketserver
+import threading
 
 # 定义端口
-port = os.environ.get('PORT', '3000')
+port = int(os.getenv('PORT', 3000))
 
-# 升级pip到最新版本
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--upgrade', 'pip'])
-
-# 定义要执行的Shell命令并赋权
-shell_command = "chmod +x start.sh && ./start.sh" 
-
-# 执行shell文件
-try:
-    completed_process = subprocess.run(['bash', '-c', shell_command], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
-    print("Command executed successfully.")
-
-except subprocess.CalledProcessError as e:
-    print(f"Error: {e.returncode}")
-    print(e.stdout)
-    print(e.stderr)
-    sys.exit(1)
-
-# sub订阅路由
+# http路由
 class MyHandler(http.server.SimpleHTTPRequestHandler):
+
+    def log_message(self, format, *args):
+        pass
 
     def do_GET(self):
         if self.path == '/':
@@ -48,7 +35,27 @@ class MyHandler(http.server.SimpleHTTPRequestHandler):
             self.send_response(404)
             self.end_headers()
             self.wfile.write(b'Not found')
+httpd = socketserver.TCPServer(('', port), MyHandler)
+server_thread = threading.Thread(target=httpd.serve_forever)
+server_thread.daemon = True
+server_thread.start()
 
-with socketserver.TCPServer(('', port), MyHandler) as httpd:
-    print(f'Server is running on port {port}')
-    httpd.serve_forever()
+# 定义要执行的Shell命令并赋权
+shell_command = "chmod +x start.sh && ./start.sh"
+
+# 执行shell文件
+try:
+    completed_process = subprocess.run(['bash', '-c', shell_command], stdout=sys.stdout, stderr=subprocess.PIPE, text=True, check=True)
+
+    print("App is running")
+    print("Thank you for using this script,enjoy!")
+
+except subprocess.CalledProcessError as e:
+    print(f"Error: {e.returncode}")
+    print("Standard Output:")
+    print(e.stdout)
+    print("Standard Error:")
+    print(e.stderr)
+    sys.exit(1)
+
+server_thread.join()
