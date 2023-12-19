@@ -16,7 +16,7 @@ fi
 
 #清理历史运行文件
 cleanup_oldfiles() {
-  rm -rf ${FILE_PATH}/boot.log ${FILE_PATH}/sub.txt ${FILE_PATH}/config.json ${FILE_PATH}/tunnel.json ${FILE_PATH}/tunnel.yaml
+  rm -rf ${FILE_PATH}/boot.log ${FILE_PATH}/sub.txt ${FILE_PATH}/config.json ${FILE_PATH}/tunnel.json ${FILE_PATH}/tunnel.yml
 }
 cleanup_oldfiles
 sleep 2
