@@ -1,21 +1,36 @@
 # 说明
 
 python-xray-argo是基于python环境使用xray，引用argo隧道，集成哪吒探针搭建科学上网节点。
-文件说明：app.py，start.sh为必要运行文件，swith为哪吒，server为cloudfared，web为xray。
+文件说明：app.py，start.sh为必要运行文件，swith为哪吒，bot为cloudfared，web为xray。
 此版本为Argo版，直连版本请移步：https://github.com/eoovve/python-xray-direct
 
 # 部署
 
-方式一：常规python环境，例如游戏平台玩具，只需上传app.py和start.sh两个文件即可，需授权777，start.sh文件设置哪吒参数和uuid
+方式一：常规python环境，例如游戏平台玩具，只需上传app.py和requirements.txt两个文件即可，需授权777,app.py中17至30行填写变量。
 
-方式二：容器平台：文件+命令结合，需root权限，上传app.py和start.sh两个文件，运行python app.py即可。
+方式二：文件+命令结合，需root权限，上传app.py和requirements.tx两个文件，先运行pip install -r requirements.txt 再运行python app.py即可。
 
-方式三：docker部署。
+方式三：docker部署，右边的packages中已打包好镜像，镜像地址：ghcr.io/eooce/python:latest 支持镜像部署的平台推荐优先使用镜像
 
+# 环境变量
+* PaaS 平台设置的环境变量
+  | 变量名        | 是否必须 | 默认值 | 备注 |
+  | ------------ | ------ | ------ | ------ |
+  | PORT         | 否 |  3000  |http服务监听端口，也是订阅端口     |
+  | FILE_PATH    | 否 |  temp  | 运行目录                         | 
+  | URL          | 否 | https://www.google.com     |项目分配的域名|
+  | TIME         | 否 | 120    |自动访问间隔时间（默认2分钟）单位:秒|
+  | UUID         | 否 | 89c13786-25aa-4520-b2e7-12cd60fb5202|UUID|
+  | ARGO_PORT    | 否 |  8001  |argo隧道端口，固定隧道token需和cloudflare后台设置的一致|
+  | NEZHA_SERVER | 否 |        | 哪吒服务端域名，例如nz.aaa.com    |
+  | NEZHA_PORT   | 否 |  5555  | 当哪吒端口为443时，自动开启tls    |
+  | NEZHA_KEY    | 否 |        | 哪吒客务端专用KEY                |
+  | ARGO_DOMAIN  | 否 |        | argo固定隧道域名                 |
+  | ARGO_AUTH    | 否 |        | argo固定隧道json或token          |
+  | CFIP         | 否 |skk.moe | 节点优选域名或ip                 |
+  | CFPORT       | 否 |  443   |节点端口                          |
+  | NAME         | 否 |  Vls   | 节点名称前缀，例如：Glitch，Replit|
 
-
-# 鸣谢下方作者的项目
- https://github.com/mjjonone/mjj
 
 # 免责声明
 本程序仅供学习了解, 非盈利目的，请于下载后 24 小时内删除, 不得用作任何商业用途, 文字、数据及图片均有所属版权, 如转载须注明来源。
