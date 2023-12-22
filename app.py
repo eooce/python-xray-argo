@@ -6,7 +6,7 @@ import http.server
 import socketserver
 import threading
 import requests
-from flask import Flask, request, Response
+from flask import Flask
 import json
 import time
 import base64
