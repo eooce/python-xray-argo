@@ -32,8 +32,8 @@ python-xray-argo是基于python环境使用xray，引用argo隧道，集成哪�
 
 # 节点输出
 1：输出sub.txt节点文件，默认存放路径为temp
-2：订阅：分配的域名/sub     
-3：非标端口订阅(游戏类):分配的域名:端口/sub,前缀是http，不是https
+2：订阅：分配的域名/sub;例如:https://www.google.com/sub
+3：非标端口订阅(游戏类):分配的域名:端口/sub,前缀不是https，而是http，例如http://www.google.com:1234/sub
 
 # 其他
 * 此版本为Argo版，直连版本请移步：https://github.com/eoovve/python-xray-direct
