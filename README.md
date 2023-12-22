@@ -30,6 +30,11 @@ python-xray-argo是基于python环境使用xray，引用argo隧道，集成哪�
   | CFPORT       | 否 |  443   |节点端口                          |
   | NAME         | 否 |  Vls   | 节点名称前缀，例如：Glitch，Replit|
 
+# 节点输出
+1：输出sub.txt节点文件，默认存放路径为temp
+2：订阅：分配的域名/sub     
+3：非标端口订阅(游戏类):分配的域名:端口/sub,前缀是http，不是https
+
 # 其他
 * 此版本为Argo版，直连版本请移步：https://github.com/eoovve/python-xray-direct
 * 如需链接github部署，Fork后请先删除此README.md说明文件部署；支持Docker镜像部署又需要链接github部署的平台，只需新建项目，新建一个Dockerfile文件，里面填写FROM ghcr.io/eooce/python:latest部署即可
