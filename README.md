@@ -1,6 +1,6 @@
 # 说明
 
-python-xray-argo是基于python环境使用xray，引用argo隧道，集成哪吒探针搭建科学上网节点。
+本项目是基于python环境使用xray，引用argo隧道，集成哪吒探针(可选)搭建科学上网节点。
 文件说明：app.py，start.sh为必要运行文件，swith为哪吒，bot为cloudfared，web为xray。
 
 # 部署
@@ -31,9 +31,9 @@ python-xray-argo是基于python环境使用xray，引用argo隧道，集成哪�
   | NAME         | 否 |  Vls   | 节点名称前缀，例如：Glitch，Replit|
 
 # 节点输出
-1：输出sub.txt节点文件，默认存放路径为temp
-2：订阅：分配的域名/sub;例如https://www.google.com/sub
-3：非标端口订阅(游戏类):分配的域名:端口/sub,前缀不是https，而是http，例如http://www.google.com:1234/sub
+* 输出sub.txt节点文件，默认存放路径为temp
+* 订阅：分配的域名/sub;例如https://www.google.com/sub
+* 非标端口订阅(游戏类):分配的域名:端口/sub,前缀不是https，而是http，例如http://www.google.com:1234/sub
 
 # 其他
 * 此版本为Argo版，直连版本请移步：https://github.com/eoovve/python-xray-direct
