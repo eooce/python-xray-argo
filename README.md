@@ -5,9 +5,9 @@ python-xray-argo是基于python环境使用xray，引用argo隧道，集成哪�
 
 # 部署
 
-方式一：常规python环境，例如游戏平台玩具，只需上传app.py和requirements.txt两个文件即可，需授权777,app.py中17至30行填写变量。
+方式一：常规python环境，例如游戏平台玩具，只需上传app.py和requirements.txt两个文件即可，app.py需授权777,app.py中17至30行填写变量。
 
-方式二：文件+命令结合，需root权限，上传app.py和requirements.tx两个文件，先运行pip install -r requirements.txt 再运行python app.py即可。
+方式二：文件+命令结合，app.py需赋权，上传app.py和requirements.tx两个文件，先运行chmod +x app.py 再运行pip install -r requirements.txt 然后运行python app.py即可。
 
 方式三：docker部署，右边的packages中已打包好镜像，镜像地址：ghcr.io/eooce/python:latest 支持镜像部署的平台推荐优先使用镜像
 
