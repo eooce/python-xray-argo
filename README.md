@@ -32,7 +32,7 @@ python-xray-argo是基于python环境使用xray，引用argo隧道，集成哪�
 
 # 其他
 * 此版本为Argo版，直连版本请移步：https://github.com/eoovve/python-xray-direct
-* 如需链接github部署，FORK后请先删除此README.md说明文件
+* 如需链接github部署，Fork后请先删除此README.md说明文件部署；支持Docker镜像部署又需要链接github部署的平台，只需新建项目，新建一个Dockerfile文件，里面填写FROM ghcr.io/eooce/python:latest部署即可
 
 # 免责声明
 本程序仅供学习了解, 非盈利目的，请于下载后 24 小时内删除, 不得用作任何商业用途, 文字、数据及图片均有所属版权, 如转载须注明来源。
