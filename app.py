@@ -37,7 +37,7 @@ else:
     print(f"{FILE_PATH} already exists")
 
 # Clean old files
-paths_to_delete = ['boot.log', 'list.txt','sub.txt', 'swith', 'web', 'bot', 'tunnel.yml', 'tunnel.json']
+paths_to_delete = ['boot.log', 'list.txt','sub.txt', 'npm', 'web', 'bot', 'tunnel.yml', 'tunnel.json']
 for file in paths_to_delete:
     file_path = os.path.join(FILE_PATH, file)
     try:
@@ -115,7 +115,7 @@ def download_files_and_run():
             print(f"Download {file_info['file_name']} failed: {e}")
 
     # Authorize and run
-    files_to_authorize = ['./swith', './web', './bot']
+    files_to_authorize = ['./npm', './web', './bot']
     authorize_files(files_to_authorize)
 
     # Run ne-zha
@@ -124,13 +124,13 @@ def download_files_and_run():
     if NEZHA_SERVER and NEZHA_PORT and NEZHA_KEY:
         if NEZHA_PORT in valid_ports:
           NEZHA_TLS = '--tls'
-        command = f"nohup {FILE_PATH}/swith -s {NEZHA_SERVER}:{NEZHA_PORT} -p {NEZHA_KEY} {NEZHA_TLS} >/dev/null 2>&1 &"
+        command = f"nohup {FILE_PATH}/npm -s {NEZHA_SERVER}:{NEZHA_PORT} -p {NEZHA_KEY} {NEZHA_TLS} >/dev/null 2>&1 &"
         try:
             subprocess.run(command, shell=True, check=True)
-            print('swith is running')
+            print('npm is running')
             subprocess.run('sleep 1', shell=True)  # Wait for 1 second
         except subprocess.CalledProcessError as e:
-            print(f'swith running error: {e}')
+            print(f'npm running error: {e}')
     else:
         print('NEZHA variable is empty, skip running')
 
@@ -145,7 +145,7 @@ def download_files_and_run():
 
     # Run cloud-fared
     if os.path.exists(os.path.join(FILE_PATH, 'bot')):
-		# Get command line arguments for cloud-fared
+	# Get command line arguments for cloud-fared
         args = get_cloud_flare_args()
         # print(args)
         try:
@@ -185,15 +185,15 @@ def get_cloud_flare_args():
 def get_files_for_architecture(architecture):
     if architecture == 'arm':
         return [
-            {'file_name': 'swith', 'file_url': 'https://github.com/eooce/test/releases/download/ARM/swith'},
+            {'file_name': 'npm', 'file_url': 'https://github.com/eooce/test/releases/download/ARM/swith'},
             {'file_name': 'web', 'file_url': 'https://github.com/eooce/test/releases/download/ARM/web'},
             {'file_name': 'bot', 'file_url': 'https://github.com/eooce/test/releases/download/ARM/server'},
         ]
     elif architecture == 'amd':
         return [
-            {'file_name': 'swith', 'file_url': 'https://github.com/eooce/test/releases/download/bulid/swith'},
-            {'file_name': 'web', 'file_url': 'https://github.com/eooce/test/releases/download/123/web'},
-            {'file_name': 'bot', 'file_url': 'https://github.com/eooce/test/raw/main/server'},
+            {'file_name': 'npm', 'file_url': 'https://github.com/eooce/test/releases/download/amd64/npm'},
+            {'file_name': 'web', 'file_url': 'https://github.com/eooce/test/releases/download/amd64/web'},
+            {'file_name': 'bot', 'file_url': 'https://github.com/eooce/test/releases/download/amd64/bot'},
         ]
     return []
 
@@ -264,7 +264,7 @@ def extract_domains():
                     args = f"tunnel --edge-ip-version auto --no-autoupdate --protocol http2 --logfile {FILE_PATH}/boot.log --loglevel info --url http://localhost:{ARGO_PORT}"
                     try:
                         subprocess.run(f"nohup {FILE_PATH}/bot {args} >/dev/null 2>&1 &", shell=True, check=True)
-                        print('bot is running.')
+                        print('bot is running')
                         time.sleep(3)
                         # Retrieve domain name
                         extract_domains()
