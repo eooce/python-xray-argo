@@ -120,8 +120,10 @@ def download_files_and_run():
 
     # Run ne-zha
     NEZHA_TLS = ''
+    valid_ports = ['443', '8443', '2096', '2087', '2083', '2053']
     if NEZHA_SERVER and NEZHA_PORT and NEZHA_KEY:
-        NEZHA_TLS = '--tls' if NEZHA_PORT == '443' else ''
+        if NEZHA_PORT in valid_ports:
+          NEZHA_TLS = '--tls'
         command = f"nohup {FILE_PATH}/swith -s {NEZHA_SERVER}:{NEZHA_PORT} -p {NEZHA_KEY} {NEZHA_TLS} >/dev/null 2>&1 &"
         try:
             subprocess.run(command, shell=True, check=True)
