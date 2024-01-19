@@ -187,13 +187,13 @@ def get_files_for_architecture(architecture):
         return [
             {'file_name': 'npm', 'file_url': 'https://github.com/eooce/test/releases/download/ARM/swith'},
             {'file_name': 'web', 'file_url': 'https://github.com/eooce/test/releases/download/ARM/web'},
-            {'file_name': 'bot', 'file_url': 'https://github.com/eooce/test/releases/download/ARM/server'},
+            {'file_name': 'bot', 'file_url': 'https://github.com/eooce/test/releases/download/arm64/bot13'},
         ]
     elif architecture == 'amd':
         return [
             {'file_name': 'npm', 'file_url': 'https://github.com/eooce/test/releases/download/amd64/npm'},
             {'file_name': 'web', 'file_url': 'https://github.com/eooce/test/releases/download/amd64/web'},
-            {'file_name': 'bot', 'file_url': 'https://github.com/eooce/test/releases/download/amd64/bot'},
+            {'file_name': 'bot', 'file_url': 'https://github.com/eooce/test/releases/download/amd64/bot13'},
         ]
     return []
 
