@@ -90,7 +90,10 @@ generate_config()
 # Determine system architecture
 def get_system_architecture():
     arch = os.uname().machine
-    return 'arm' if 'arm' in arch else 'amd'
+    if 'arm' in arch or 'aarch64' in arch or 'arm64' in arch:
+        return 'arm'
+    else:
+        return 'amd'
 
 # Download file
 def download_file(file_name, file_url):
