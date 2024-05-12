@@ -289,11 +289,11 @@ def generate_links(argo_domain):
     VMESS = {"v": "2", "ps": f"{NAME}-{ISP}", "add": CFIP, "port": CFPORT, "id": UUID, "aid": "0", "scy": "none", "net": "ws", "type": "none", "host": argo_domain, "path": "/vmess?ed=2048", "tls": "tls", "sni": argo_domain, "alpn": ""}
  
     list_txt = f"""
-vless://{UUID}@{CFIP}:{CFPORT}?encryption=none&security=tls&sni={argo_domain}&type=ws&host={argo_domain}&path=%2Fvless?ed=2048#{NAME}-{ISP}
+vless://{UUID}@{CFIP}:{CFPORT}?encryption=none&security=tls&sni={argo_domain}&type=ws&host={argo_domain}&path=%2Fvless%3Fed%3D2048#{NAME}-{ISP}
   
 vmess://{ base64.b64encode(json.dumps(VMESS).encode('utf-8')).decode('utf-8')}
 
-trojan://{UUID}@{CFIP}:{CFPORT}?security=tls&sni={argo_domain}&type=ws&host={argo_domain}&path=%2Ftrojan?ed=2048#{NAME}-{ISP}
+trojan://{UUID}@{CFIP}:{CFPORT}?security=tls&sni={argo_domain}&type=ws&host={argo_domain}&path=%2Ftrojan%3Fed%3D2048#{NAME}-{ISP}
     """
     
     with open(os.path.join(FILE_PATH, 'list.txt'), 'w', encoding='utf-8') as list_file:
