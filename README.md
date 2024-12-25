@@ -17,7 +17,7 @@
   | 变量名        | 是否必须 | 默认值 | 备注 |
   | ------------ | ------ | ------ | ------ |
   | PORT         | 否 |  3000  |http服务监听端口，也是订阅端口     |
-  | FILE_PATH    | 否 |  temp  | 运行目录                         | 
+  | FILE_PATH    | 否 |  tmp   | 运行目录                         | 
   | URL          | 否 | https://www.google.com     |项目分配的域名|
   | TIME         | 否 | 120    |自动访问间隔时间（默认2分钟）单位:秒|
   | UUID         | 否 | abe2f2de-13ae-4f1f-bea5-d6c881ca3888|UUID|
