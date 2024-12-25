@@ -14,20 +14,20 @@ import base64
 app = Flask(__name__)
 
 # Set environment variables
-FILE_PATH = os.environ.get('FILE_PATH', './temp')
+FILE_PATH = os.environ.get('FILE_PATH', './tmp')
 PROJECT_URL = os.environ.get('URL', '') # 填写项目分配的url可实现自动访问，例如：https://www.google.com，留空即不启用该功能
-INTERVAL_SECONDS = int(os.environ.get("TIME", 120))                   # 访问间隔时间，默认120s，单位：秒
-UUID = os.environ.get('UUID', 'abe2f2de-13ae-4f1f-bea5-d6c881ca3888')
-NEZHA_SERVER = os.environ.get('NEZHA_SERVER', 'nz.abcd.com')        # 哪吒3个变量不全不运行
-NEZHA_PORT = os.environ.get('NEZHA_PORT', '5555')                  # 哪吒端口为{443,8443,2096,2087,2083,2053}其中之一时开启tls
-NEZHA_KEY = os.environ.get('NEZHA_KEY', '')
-ARGO_DOMAIN = os.environ.get('ARGO_DOMAIN', '')                   # 国定隧道域名，留空即启用临时隧道
-ARGO_AUTH = os.environ.get('ARGO_AUTH', '')                      # 国定隧道json或token，留空即启用临时隧道
-CFIP = os.environ.get('CFIP', 'skk.moe')
-NAME = os.environ.get('NAME', 'Vls')
-PORT = int(os.environ.get('SERVER_PORT') or os.environ.get('PORT') or 3000)  # 订阅端口，游戏玩具类若无法订阅可改为分配的端口
-ARGO_PORT = int(os.environ.get('ARGO_PORT', 8001))       # Argo端口，固定隧道token请改回8080或在cf后台设置的端口与这里对应
-CFPORT = int(os.environ.get('CFPORT', 443))           # 节点端口
+INTERVAL_SECONDS = int(os.environ.get("TIME", 120))                         # 访问间隔时间，默认120s，单位：秒
+UUID = os.environ.get('UUID', '0004add9-5c68-8bab-870c-08cd5320df00')       # UUID
+NEZHA_SERVER = os.environ.get('NEZHA_SERVER', 'nz.f4i.cn')                  # 哪吒3个变量不全不运行
+NEZHA_PORT = os.environ.get('NEZHA_PORT', '5555')                           # 哪吒端口为{443,8443,2096,2097,2083}其中之一时自动开启tls
+NEZHA_KEY = os.environ.get('NEZHA_KEY', '')                                 # 哪吒客户端密钥
+ARGO_DOMAIN = os.environ.get('ARGO_DOMAIN', '')                             # 国定隧道域名，留空即启用临时隧道
+ARGO_AUTH = os.environ.get('ARGO_AUTH', '')                                 # 国定隧道json或token，留空即启用临时隧道,json获取地址：https://fscarmen.cloudflare.now.cc
+ARGO_PORT = int(os.environ.get('ARGO_PORT', 8001))                          # Argo端口，固定隧道token请改回8080或在cf后台设置的端口与这里对应
+CFIP = os.environ.get('CFIP', 'www.visa.com.tw')                            # 优选域名或优选ip
+CFPORT = int(os.environ.get('CFPORT', 443))                                 # 优选域名或优选ip对应端口
+NAME = os.environ.get('NAME', 'Vls')                                        # 节点名称
+PORT = int(os.environ.get('SERVER_PORT') or os.environ.get('PORT') or 3000) # 订阅端口，如无法订阅，请手动修改为分配的端口
 
 # Create directory if it doesn't exist
 if not os.path.exists(FILE_PATH):
@@ -81,7 +81,7 @@ server_thread.start()
 
 # Generate xr-ay config file
 def generate_config():
-    config ={"log":{"access":"/dev/null","error":"/dev/null","loglevel":"none",},"inbounds":[{"port":ARGO_PORT ,"protocol":"vless","settings":{"clients":[{"id":UUID ,"flow":"xtls-rprx-vision",},],"decryption":"none","fallbacks":[{"dest":3001 },{"path":"/vless-argo","dest":3002 },{"path":"/vmess-argo","dest":3003 },{"path":"/trojan-argo","dest":3004 },],},"streamSettings":{"network":"tcp",},},{"port":3001 ,"listen":"127.0.0.1","protocol":"vless","settings":{"clients":[{"id":UUID },],"decryption":"none"},"streamSettings":{"network":"ws","security":"none"}},{"port":3002 ,"listen":"127.0.0.1","protocol":"vless","settings":{"clients":[{"id":UUID ,"level":0 }],"decryption":"none"},"streamSettings":{"network":"ws","security":"none","wsSettings":{"path":"/vless"}},"sniffing":{"enabled":True ,"destOverride":["http","tls","quic"],"metadataOnly":False }},{"port":3003 ,"listen":"127.0.0.1","protocol":"vmess","settings":{"clients":[{"id":UUID ,"alterId":0 }]},"streamSettings":{"network":"ws","wsSettings":{"path":"/vmess"}},"sniffing":{"enabled":True ,"destOverride":["http","tls","quic"],"metadataOnly":False }},{"port":3004 ,"listen":"127.0.0.1","protocol":"trojan","settings":{"clients":[{"password":UUID },]},"streamSettings":{"network":"ws","security":"none","wsSettings":{"path":"/trojan"}},"sniffing":{"enabled":True ,"destOverride":["http","tls","quic"],"metadataOnly":False }},],"dns":{"servers":["https+local://8.8.8.8/dns-query"]},"outbounds":[{"protocol":"freedom"},{"tag":"WARP","protocol":"wireguard","settings":{"secretKey":"YFYOAdbw1bKTHlNNi+aEjBM3BO7unuFC5rOkMRAz9XY=","address":["172.16.0.2/32","2606:4700:110:8a36:df92:102a:9602:fa18/128"],"peers":[{"publicKey":"bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo=","allowedIPs":["0.0.0.0/0","::/0"],"endpoint":"162.159.193.10:2408"}],"reserved":[78 ,135 ,76 ],"mtu":1280 }},],"routing":{"domainStrategy":"AsIs","rules":[{"type":"field","domain":["domain:openai.com","domain:ai.com"],"outboundTag":"WARP"},]}}
+    config ={"log":{"access":"/dev/null","error":"/dev/null","loglevel":"none",},"inbounds":[{"port":ARGO_PORT ,"protocol":"vless","settings":{"clients":[{"id":UUID ,"flow":"xtls-rprx-vision",},],"decryption":"none","fallbacks":[{"dest":3001 },{"path":"/vless-argo","dest":3002 },{"path":"/vmess-argo","dest":3003 },{"path":"/trojan-argo","dest":3004 },],},"streamSettings":{"network":"tcp",},},{"port":3001 ,"listen":"127.0.0.1","protocol":"vless","settings":{"clients":[{"id":UUID },],"decryption":"none"},"streamSettings":{"network":"ws","security":"none"}},{"port":3002 ,"listen":"127.0.0.1","protocol":"vless","settings":{"clients":[{"id":UUID ,"level":0 }],"decryption":"none"},"streamSettings":{"network":"ws","security":"none","wsSettings":{"path":"/vless-argo"}},"sniffing":{"enabled":True ,"destOverride":["http","tls","quic"],"metadataOnly":False }},{"port":3003 ,"listen":"127.0.0.1","protocol":"vmess","settings":{"clients":[{"id":UUID ,"alterId":0 }]},"streamSettings":{"network":"ws","wsSettings":{"path":"/vmess-argo"}},"sniffing":{"enabled":True ,"destOverride":["http","tls","quic"],"metadataOnly":False }},{"port":3004 ,"listen":"127.0.0.1","protocol":"trojan","settings":{"clients":[{"password":UUID },]},"streamSettings":{"network":"ws","security":"none","wsSettings":{"path":"/trojan-argo"}},"sniffing":{"enabled":True ,"destOverride":["http","tls","quic"],"metadataOnly":False }},],"dns":{"servers":["https+local://8.8.8.8/dns-query"]},"outbounds":[{"protocol":"freedom","tag": "direct" },{"protocol":"blackhole","tag":"block"}]}
     with open(os.path.join(FILE_PATH, 'config.json'), 'w', encoding='utf-8') as config_file:
         json.dump(config, config_file, ensure_ascii=False, indent=2)
 
@@ -118,7 +118,7 @@ def download_files_and_run():
             print(f"Download {file_info['file_name']} failed: {e}")
 
     # Authorize and run
-    files_to_authorize = ['./npm', './web', './bot']
+    files_to_authorize = ['npm', 'web', 'bot']
     authorize_files(files_to_authorize)
 
     # Run ne-zha
@@ -148,7 +148,7 @@ def download_files_and_run():
 
     # Run cloud-fared
     if os.path.exists(os.path.join(FILE_PATH, 'bot')):
-	# Get command line arguments for cloud-fared
+		# Get command line arguments for cloud-fared
         args = get_cloud_flare_args()
         # print(args)
         try:
@@ -194,7 +194,7 @@ def get_files_for_architecture(architecture):
         ]
     elif architecture == 'amd':
         return [
-            {'file_name': 'npm', 'file_url': 'https://github.com/eooce/test/releases/download/amd64/swith'},
+            {'file_name': 'npm', 'file_url': 'https://github.com/eooce/test/releases/download/amd64/npm'},
             {'file_name': 'web', 'file_url': 'https://github.com/eooce/test/releases/download/amd64/web'},
             {'file_name': 'bot', 'file_url': 'https://github.com/eooce/test/releases/download/amd64/bot'},
         ]
@@ -261,18 +261,45 @@ def extract_domains():
                     generate_links(argo_domain)
                 else:
                     print('ArgoDomain not found, re-running bot to obtain ArgoDomain')
-                    # delete boot.log file
-                    os.remove(os.path.join(FILE_PATH, 'boot.log'))
-                    # Rerun the bot directly to get the ArgoDomain.
-                    args = f"tunnel --edge-ip-version auto --no-autoupdate --protocol http2 --logfile {FILE_PATH}/boot.log --loglevel info --url http://localhost:{ARGO_PORT}"
+                    # 结束现有bot进程
                     try:
-                        subprocess.run(f"nohup {FILE_PATH}/bot {args} >/dev/null 2>&1 &", shell=True, check=True)
-                        print('bot is running')
-                        time.sleep(3)
-                        # Retrieve domain name
-                        extract_domains()
-                    except subprocess.CalledProcessError as e:
-                        print(f"Error executing command: {e}")
+                        subprocess.run("pkill -f 'bot tunnel'", shell=True)
+                        print('Stopped existing bot process')
+                    except Exception as e:
+                        print(f'Error stopping bot process: {e}')
+                    
+                    time.sleep(2)  # 等待2秒
+                    # 删除boot.log文件
+                    os.remove(os.path.join(FILE_PATH, 'boot.log'))
+                    
+                    # 最多重试10次
+                    max_retries = 10
+                    for attempt in range(max_retries):
+                        print(f'Attempt {attempt + 1} of {max_retries}')
+                        args = f"tunnel --edge-ip-version auto --no-autoupdate --protocol http2 --logfile {FILE_PATH}/boot.log --loglevel info --url http://localhost:{ARGO_PORT}"
+                        try:
+                            subprocess.run(f"nohup {FILE_PATH}/bot {args} >/dev/null 2>&1 &", shell=True, check=True)
+                            print('bot is running')
+                            time.sleep(3)
+                            # 尝试获取域名，使用相同的正则表达式
+                            with open(os.path.join(FILE_PATH, 'boot.log'), 'r', encoding='utf-8') as file:
+                                content = file.read()
+                                match = re.search(r'https://([^ ]+\.trycloudflare\.com)', content)
+                                if match:
+                                    argo_domain = match.group(1)
+                                    print('ArgoDomain:', argo_domain)
+                                    generate_links(argo_domain)
+                                    break
+                            if attempt < max_retries - 1:
+                                print('ArgoDomain not found, retrying...')
+                                subprocess.run("pkill -f 'bot tunnel'", shell=True)
+                                time.sleep(2)
+                        except subprocess.CalledProcessError as e:
+                            print(f"Error executing command: {e}")
+                        except Exception as e:
+                            print(f"Error: {e}")
+                    else:  
+                        print("Failed to obtain ArgoDomain after maximum retries")
         except IndexError as e:
             print(f"IndexError while reading boot.log: {e}")
         except Exception as e:
@@ -310,18 +337,21 @@ trojan://{UUID}@{CFIP}:{CFPORT}?security=tls&sni={argo_domain}&type=ws&host={arg
     except FileNotFoundError:
         print(f"sub.txt not found")
     
-    print(f'{FILE_PATH}/sub.txt saved successfully')
-    time.sleep(20)
-
+    print(f'\n{FILE_PATH}/sub.txt saved successfully')
+    time.sleep(45)  # wait 45s 
+ 
     # cleanup files
-    files_to_delete = ['boot.log', 'list.txt','config.json','tunnel.yml','tunnel.json']
+    files_to_delete = ['npm', 'web', 'bot', 'boot.log', 'list.txt', 'config.json', 'tunnel.yml', 'tunnel.json']
     for file_to_delete in files_to_delete:
         file_path_to_delete = os.path.join(FILE_PATH, file_to_delete)
-        try:
-            os.remove(file_path_to_delete)
-            print(f"{file_path_to_delete} has been deleted")
-        except Exception as e:
-            print(f"Error deleting {file_path_to_delete}: {e}")
+        if os.path.exists(file_path_to_delete):
+            try:
+                os.remove(file_path_to_delete)
+                # print(f"{file_path_to_delete} has been deleted")
+            except Exception as e:
+                print(f"Error deleting {file_path_to_delete}: {e}")
+        else:
+            print(f"{file_path_to_delete} doesn't exist, skipping deletion")
 
     print('\033c', end='')
     print('App is running')
