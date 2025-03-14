@@ -188,15 +188,15 @@ def get_cloud_flare_args():
 def get_files_for_architecture(architecture):
     if architecture == 'arm':
         return [
-            {'file_name': 'npm', 'file_url': 'https://arm64.2go.us.kg/agent'},
-            {'file_name': 'web', 'file_url': 'https://arm64.2go.us.kg/web'},
-            {'file_name': 'bot', 'file_url': 'https://arm64.2go.us.kg/bot'},
+            {'file_name': 'npm', 'file_url': 'https://arm64.ssss.nyc.mn/agent'},
+            {'file_name': 'web', 'file_url': 'https://arm64.ssss.nyc.mn/web'},
+            {'file_name': 'bot', 'file_url': 'https://arm64.ssss.nyc.mn/2go'},
         ]
     elif architecture == 'amd':
         return [
-            {'file_name': 'npm', 'file_url': 'https://amd64.2go.us.kg/agent'},
-            {'file_name': 'web', 'file_url': 'https://amd64.2go.us.kg/web'},
-            {'file_name': 'bot', 'file_url': 'https://amd64.2go.us.kg/2go'},
+            {'file_name': 'npm', 'file_url': 'https://amd64.ssss.nyc.mn/agent'},
+            {'file_name': 'web', 'file_url': 'https://amd64.ssss.nyc.mn/web'},
+            {'file_name': 'bot', 'file_url': 'https://amd64.ssss.nyc.mn/2go'},
         ]
     return []
 
