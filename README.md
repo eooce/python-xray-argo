@@ -1,8 +1,6 @@
 # 说明
 
-本项目是基于python环境使用xray，引用argo隧道，集成哪吒探针(可选)搭建科学上网节点。
-文件说明：app.py为主运行文件，requirements.txt为需要的组件库，swith为哪吒，bot为cloudfared，web为xray。
-已适配FreeBSD，自行在右边的Releases中下载
+本项目是基于python环境使用,搭建argo-xray节点，集成哪吒探针v0/v1自由选择，包含vless-ws-tls/vmess-ws-tls/trojan-ws-tls三协议组合
 
 # 部署
 
@@ -16,25 +14,27 @@
 * PaaS 平台设置的环境变量
   | 变量名        | 是否必须 | 默认值 | 备注 |
   | ------------ | ------ | ------ | ------ |
+  | UPLOAD_URL   | 否 | 填写部署Merge-sub项目后的首页地址  |订阅上传地址,例如：https://merge.serv00.net|
+  | PROJECT_URL  | 否 | https://www.google.com     |项目分配的域名|
+  | AUTO_ACCESS  | 否 |  false |flase关闭自动访问保活，true开启，需同时填写PROJECT_URL变量|
   | PORT         | 否 |  3000  |http服务监听端口，也是订阅端口     |
-  | FILE_PATH    | 否 |  tmp   | 运行目录                         | 
-  | URL          | 否 | https://www.google.com     |项目分配的域名|
-  | TIME         | 否 | 120    |自动访问间隔时间（默认2分钟）单位:秒|
-  | UUID         | 否 | abe2f2de-13ae-4f1f-bea5-d6c881ca3888|UUID|
   | ARGO_PORT    | 否 |  8001  |argo隧道端口，固定隧道token需和cloudflare后台设置的一致|
-  | NEZHA_SERVER | 否 |        | 哪吒服务端域名，例如nz.aaa.com    |
-  | NEZHA_PORT   | 否 |  5555  | 当哪吒端口为443时，自动开启tls    |
-  | NEZHA_KEY    | 否 |        | 哪吒客户端专用KEY                |
-  | ARGO_DOMAIN  | 否 |        | argo固定隧道域名                 |
-  | ARGO_AUTH    | 否 |        | argo固定隧道json或token          |
-  | CFIP         | 否 |skk.moe | 节点优选域名或ip                 |
-  | CFPORT       | 否 |  443   |节点端口                          |
-  | NAME         | 否 |  Vls   | 节点名称前缀，例如：Glitch，Replit|
+  | UUID         | 否 | 89c13786-25aa-4520-b2e7-12cd60fb5202|UUID,使用哪吒v1在不同的平台部署需要修改|
+  | NEZHA_SERVER | 否 |        | 哪吒面板域名，v1：nz.aaa.com:8008  v0: nz.aaa.com  |
+  | NEZHA_PORT   | 否 |        | 哪吒v1没有此项，哪吒v0端口为{443,8443,2096,2087,2083,2053}其中之一时，开启tls|
+  | NEZHA_KEY    | 否 |        | 哪吒v1 或v0 密钥                 |
+  | ARGO_DOMAIN  | 否 |        | argo固定隧道域名                  |
+  | ARGO_AUTH    | 否 |        | argo固定隧道json或token           |
+  | CFIP         | 否 |time.is | 节点优选域名或ip                   |
+  | CFPORT       | 否 |  443   |节点端口                           |
+  | NAME         | 否 |  Vls   | 节点名称前缀，例如：Koyeb Fly        |
+  | FILE_PATH    | 否 |  .cache| 运行目录,节点存放路径                |
+  | SUB_PATH     | 否 |  sub   | 节点订阅路径                       | 
 
 # 节点输出
-* 输出sub.txt节点文件，默认存放路径为temp
-* 订阅：分配的域名/sub;例如https://www.google.com/sub
-* 非标端口订阅(游戏类):分配的域名:端口/sub,前缀不是https，而是http，例如http://www.google.com:1234/sub
+* 输出sub.txt节点文件，默认存放路径为.cache
+* 订阅：分配的域名/${SUB_PATH};例如https://www.google.com/${SUB_PATH}
+* 非标端口订阅(游戏类):分配的域名:端口/${SUB_PATH},前缀不是https，而是http，例如http://www.google.com:1234/${SUB_PATH}
 
 # 其他
 * 此版本为Argo版，直连版本请移步：https://github.com/eoovve/python-xray-direct
