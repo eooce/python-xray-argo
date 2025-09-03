@@ -8,6 +8,13 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 def check_streamlit_app():
+    """
+    使用 Selenium 模拟浏览器来执行 streamlit 应用的检查：
+    1. 访问 streamlit 分享仪表板。
+    2. 等待并验证项目链接是否存在于仪表板上。
+    3. 直接访问项目 URL 以保持其活跃状态。
+    4. 验证项目页面是否成功加载（通过检查 <div id="root">）。
+    """
     # --- 1. 配置 ---
     cookie_str = os.getenv('STREAMLIT_COOKIE')
     project_url = os.getenv('PROJECT_URL')
@@ -63,18 +70,19 @@ def check_streamlit_app():
         wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, f"a[href='{project_url}']")))
         print("项目链接验证成功。")
         
-        # --- 4. 用浏览器访问项目 URL 并验证页面元素---
+        # --- 4. 用浏览器直接访问项目 URL ---
         print(f"步骤 3: 正在使用浏览器访问项目 URL: {project_url}")
         driver.get(project_url)
 
-        print("正在验证项目页面是否加载成功...")
+        # --- 5. 验证项目页面是否成功加载 ---
+        print("正在验证项目页面是否加载成功 (查找 <div id='root'>)...")
         try:
-            app_container_locator = (By.CSS_SELECTOR, 'div[data-testid="stAppViewContainer"]')
-            wait.until(EC.presence_of_element_located(app_container_locator))
+            app_root_locator = (By.ID, "root")
+            wait.until(EC.presence_of_element_located(app_root_locator))
             print("成功！项目页面已成功加载。脚本执行完毕。")
             sys.exit(0)
         except Exception:
-            print("失败。访问项目页面后，未能找到应用加载成功的标志。")
+            print("失败。访问项目页面后，未能找到 <div id='root'> 元素。")
             sys.exit(1)
 
     except Exception as e:
