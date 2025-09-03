@@ -43,18 +43,25 @@ def check_streamlit_app():
         
         print("刷新页面以应用登录状态...")
         driver.get(dashboard_url)
-        time.sleep(5) 
+        time.sleep(10) 
 
         # --- 4. 验证项目链接 ---
         print(f"步骤 2: 在仪表板上等待并验证项目链接: {project_url}")
         try:
-            wait = WebDriverWait(driver, 30)
+            wait = WebDriverWait(driver, 60)
+            print(f"仪表板页面标题是: '{driver.title}'")
+            print("正在等待项目列表容器(tbody)加载...")
+            list_container_locator = (By.TAG_NAME, "tbody")
+            wait.until(EC.presence_of_element_located(list_container_locator))
+            print("项目列表容器加载成功。")
+
+            print("正在验证具体的项目链接...")
             link_locator = (By.CSS_SELECTOR, f"a[href='{project_url}']")
-            
             wait.until(EC.presence_of_element_located(link_locator))
             print("项目链接验证成功。")
+
         except Exception as e:
-            print(f"失败。在30秒内未能于仪表板页面上找到项目链接 '{project_url}'。")
+            print(f"失败。在60秒内未能于仪表板页面上找到项目链接 '{project_url}'。")
             driver.save_screenshot('debug_screenshot.png')
             with open('debug_page_source.html', 'w', encoding='utf-8') as f:
                 f.write(driver.page_source)
@@ -64,7 +71,7 @@ def check_streamlit_app():
         # --- 5. 访问项目 URL 并验证关键词 ---
         print(f"步骤 3: 正在访问项目 URL: {project_url}")
         driver.get(project_url)
-        time.sleep(10)
+        time.sleep(15)
 
         page_content = driver.page_source
         keyword = "stop"
