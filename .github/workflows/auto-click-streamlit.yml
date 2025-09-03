@@ -3,14 +3,14 @@ name: Auto Click Streamlit App
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 */6 * * *'  # 每6小时1次
+    - cron: '0 */6 * * *'
 
 jobs:
   run-click-script:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Checkout repository
+      - name: Checkout main branch
         uses: actions/checkout@v3
 
       - name: Set up Python
@@ -18,13 +18,28 @@ jobs:
         with:
           python-version: '3.9'
 
+      - name: Install Chromium and ChromeDriver
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser chromium-chromedriver
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests beautifulsoup4
+          pip install selenium
 
       - name: Run the click script
         env:
           STREAMLIT_COOKIE: ${{ secrets.STREAMLIT_COOKIE }}
           PROJECT_URL: ${{ secrets.PROJECT_URL }}
         run: python keep-streamit.py
+      
+      # 第六步：如果失败，上传调试文件
+      - name: Upload debug artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: debug-files
+          path: |
+            debug_screenshot.png
+            debug_page_source.html
