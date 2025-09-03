@@ -12,10 +12,13 @@ def check_streamlit_app():
     cookie_str = os.getenv('STREAMLIT_COOKIE')
     project_url = os.getenv('PROJECT_URL')
     dashboard_url = "https://share.streamlit.io/"
-    base_domain_url = "https://streamlit.io/" # 主域名用于设置cookie
-
-    if not cookie_str or not project_url:
-        print("错误：请确保 STREAMLIT_COOKIE 和 PROJECT_URL 环境变量都已设置。")
+    base_domain_url = "https://streamlit.io/"
+    
+    if not project_url:
+        print("错误：PROJECT_URL 环境变量未设置。")
+        sys.exit(1)
+    if not cookie_str:
+        print("错误：STREAMLIT_COOKIE 环境变量未设置。")
         sys.exit(1)
 
     # --- 2. 设置 Selenium WebDriver ---
@@ -31,7 +34,7 @@ def check_streamlit_app():
         driver = webdriver.Chrome(options=chrome_options)
         print("WebDriver 启动成功。")
 
-        # --- 3. 使用新的策略添加 Cookie ---
+        # --- 3. 登录并找到项目链接 ---
         print(f"步骤 1: 正在访问主域名 {base_domain_url} 以设置 Cookie。")
         driver.get(base_domain_url)
         
@@ -40,51 +43,38 @@ def check_streamlit_app():
             part = part.strip()
             if '=' in part:
                 name, value = part.split('=', 1)
-                # 确保 domain 设置正确，以便子域名可以继承
                 driver.add_cookie({'name': name, 'value': value, 'domain': '.streamlit.io'})
         
         print(f"Cookie 设置完毕，正在跳转到仪表板 URL: {dashboard_url}")
         driver.get(dashboard_url)
-        time.sleep(10) 
+        time.sleep(5) 
 
-        # --- 4. 验证项目链接 ---
         print(f"步骤 2: 在仪表板上等待并验证项目链接: {project_url}")
-        try:
-            wait = WebDriverWait(driver, 60)
-            
-            print(f"仪表板页面标题是: '{driver.title}'")
-            # 验证标题不再是登录页面
-            if "Sign in" in driver.title:
-                raise Exception("登录失败，页面仍然在 Sign in 页面。请检查 Cookie 是否过期。")
+        wait = WebDriverWait(driver, 60)
+        print(f"仪表板页面标题是: '{driver.title}'")
+        if "Sign in" in driver.title:
+            raise Exception("登录失败，页面仍然在 Sign in 页面。请检查 Cookie 是否过期。")
 
-            print("正在等待项目列表容器(tbody)加载...")
-            list_container_locator = (By.TAG_NAME, "tbody")
-            wait.until(EC.presence_of_element_located(list_container_locator))
-            print("项目列表容器加载成功。")
+        print("正在等待项目列表容器(tbody)加载...")
+        wait.until(EC.presence_of_element_located((By.TAG_NAME, "tbody")))
+        print("项目列表容器加载成功。")
 
-            print("正在验证具体的项目链接...")
-            link_locator = (By.CSS_SELECTOR, f"a[href='{project_url}']")
-            wait.until(EC.presence_of_element_located(link_locator))
-            print("项目链接验证成功。")
-
-        except Exception as e:
-            print(f"失败。在60秒内未能于仪表板页面上找到项目链接 '{project_url}'。")
-            # 根据要求，已移除截图和保存源码的逻辑
-            raise e
-
-        # --- 5. 访问项目 URL 并验证关键词 ---
-        print(f"步骤 3: 正在访问项目 URL: {project_url}")
+        print("正在验证具体的项目链接...")
+        wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, f"a[href='{project_url}']")))
+        print("项目链接验证成功。")
+        
+        # --- 4. 用浏览器访问项目 URL 并验证页面元素---
+        print(f"步骤 3: 正在使用浏览器访问项目 URL: {project_url}")
         driver.get(project_url)
-        time.sleep(15)
 
-        page_content = driver.page_source
-        keyword = "stop"
-
-        if keyword in page_content:
-            print(f"成功！在项目页面上找到了关键词 '{keyword}'。")
+        print("正在验证项目页面是否加载成功...")
+        try:
+            app_container_locator = (By.CSS_SELECTOR, 'div[data-testid="stAppViewContainer"]')
+            wait.until(EC.presence_of_element_located(app_container_locator))
+            print("成功！项目页面已成功加载。脚本执行完毕。")
             sys.exit(0)
-        else:
-            print(f"失败。未能在项目页面上找到关键词 '{keyword}'。")
+        except Exception:
+            print("失败。访问项目页面后，未能找到应用加载成功的标志。")
             sys.exit(1)
 
     except Exception as e:
@@ -97,4 +87,3 @@ def check_streamlit_app():
 
 if __name__ == "__main__":
     check_streamlit_app()
-
