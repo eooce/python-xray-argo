@@ -12,6 +12,7 @@ def check_streamlit_app():
     cookie_str = os.getenv('STREAMLIT_COOKIE')
     project_url = os.getenv('PROJECT_URL')
     dashboard_url = "https://share.streamlit.io/"
+    base_domain_url = "https://streamlit.io/" # 主域名用于设置cookie
 
     if not cookie_str or not project_url:
         print("错误：请确保 STREAMLIT_COOKIE 和 PROJECT_URL 环境变量都已设置。")
@@ -30,18 +31,19 @@ def check_streamlit_app():
         driver = webdriver.Chrome(options=chrome_options)
         print("WebDriver 启动成功。")
 
-        # --- 3. 添加 Cookie 并访问仪表板 ---
-        print(f"步骤 1: 正在访问仪表板 URL: {dashboard_url}")
-        driver.get(dashboard_url)
-
+        # --- 3. 使用新的策略添加 Cookie ---
+        print(f"步骤 1: 正在访问主域名 {base_domain_url} 以设置 Cookie。")
+        driver.get(base_domain_url)
+        
         print("正在添加 Cookie...")
         for part in cookie_str.split(';'):
             part = part.strip()
             if '=' in part:
                 name, value = part.split('=', 1)
+                # 确保 domain 设置正确，以便子域名可以继承
                 driver.add_cookie({'name': name, 'value': value, 'domain': '.streamlit.io'})
         
-        print("刷新页面以应用登录状态...")
+        print(f"Cookie 设置完毕，正在跳转到仪表板 URL: {dashboard_url}")
         driver.get(dashboard_url)
         time.sleep(10) 
 
@@ -49,7 +51,12 @@ def check_streamlit_app():
         print(f"步骤 2: 在仪表板上等待并验证项目链接: {project_url}")
         try:
             wait = WebDriverWait(driver, 60)
+            
             print(f"仪表板页面标题是: '{driver.title}'")
+            # 验证标题不再是登录页面
+            if "Sign in" in driver.title:
+                raise Exception("登录失败，页面仍然在 Sign in 页面。请检查 Cookie 是否过期。")
+
             print("正在等待项目列表容器(tbody)加载...")
             list_container_locator = (By.TAG_NAME, "tbody")
             wait.until(EC.presence_of_element_located(list_container_locator))
@@ -62,6 +69,7 @@ def check_streamlit_app():
 
         except Exception as e:
             print(f"失败。在60秒内未能于仪表板页面上找到项目链接 '{project_url}'。")
+            # 根据要求，已移除截图和保存源码的逻辑
             raise e
 
         # --- 5. 访问项目 URL 并验证关键词 ---
@@ -89,3 +97,4 @@ def check_streamlit_app():
 
 if __name__ == "__main__":
     check_streamlit_app()
+
