@@ -62,10 +62,6 @@ def check_streamlit_app():
 
         except Exception as e:
             print(f"失败。在60秒内未能于仪表板页面上找到项目链接 '{project_url}'。")
-            driver.save_screenshot('debug_screenshot.png')
-            with open('debug_page_source.html', 'w', encoding='utf-8') as f:
-                f.write(driver.page_source)
-            print("已保存 debug_screenshot.png 和 debug_page_source.html 以供分析。")
             raise e
 
         # --- 5. 访问项目 URL 并验证关键词 ---
