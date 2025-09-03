@@ -33,12 +33,3 @@ jobs:
           STREAMLIT_COOKIE: ${{ secrets.STREAMLIT_COOKIE }}
           PROJECT_URL: ${{ secrets.PROJECT_URL }}
         run: python keep-streamit.py
-
-      - name: Upload debug artifacts on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: debug-files
-          path: |
-            debug_screenshot.png
-            debug_page_source.html
