@@ -26,4 +26,5 @@ jobs:
       - name: Run the click script
         env:
           STREAMLIT_COOKIE: ${{ secrets.STREAMLIT_COOKIE }}
+          TARGET_URL: ${{ secrets.TARGET_URL }}
         run: python keep-streamit.py
