@@ -3,14 +3,17 @@ import os
 import sys
 
 def check_streamlit_app():
-    # 从环境变量中获取 Cookie
+    # 从环境变量中获取配置
     cookie = os.getenv('STREAMLIT_COOKIE')
+    url = os.getenv('TARGET_URL')
+
+    # 检查环境变量是否都已设置
     if not cookie:
         print("错误：STREAMLIT_COOKIE 环境变量未设置。")
         sys.exit(1)
-
-    # 目标 URL
-    url = "https://python-xray-argo-yutian81.streamlit.app/"
+    if not url:
+        print("错误：TARGET_URL 环境变量未设置。")
+        sys.exit(1)
 
     # 设置请求头，模拟浏览器并包含 Cookie
     headers = {
@@ -23,7 +26,7 @@ def check_streamlit_app():
 
     try:
         print(f"正在访问 URL: {url}")
-        response = requests.get(url, headers=headers, timeout=60) # 设置60秒超时
+        response = requests.get(url, headers=headers, timeout=60)
         response.raise_for_status()
         page_content = response.text
         keyword = "stop"
