@@ -12,8 +12,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          ref: streamit
 
       - name: Set up Python
         uses: actions/setup-python@v4
