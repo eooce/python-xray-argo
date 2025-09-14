@@ -14,16 +14,16 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 # Environment variables
 UPLOAD_URL = os.environ.get('UPLOAD_URL', '')          # 节点或订阅上传地址,只填写这个地址将上传节点,同时填写PROJECT_URL将上传订阅，例如：https://merge.serv00.net
-PROJECT_URL = os.environ.get('PROJECT_URL', '')        # 项目url,需要自动保活或自动上传订阅需要填写,例如：https://www.google.com,
-AUTO_ACCESS = os.environ.get('AUTO_ACCESS', 'false').lower() == 'true'  # false关闭自动保活, true开启自动保活，默认关闭
+PROJECT_URL = os.environ.get('PROJECT_URL', 'node.waifly.com:28196')        # 项目url,需要自动保活或自动上传订阅需要填写,例如：https://www.google.com,
+AUTO_ACCESS = os.environ.get('AUTO_ACCESS', 'true').lower() == 'true'  # false关闭自动保活, true开启自动保活，默认关闭
 FILE_PATH = os.environ.get('FILE_PATH', './.cache')    # 运行路径,sub.txt保存路径
 SUB_PATH = os.environ.get('SUB_PATH', 'sub')           # 订阅token,默认sub，例如：https://www.google.com/sub
-UUID = os.environ.get('UUID', '20e6e496-cf19-45c8-b883-14f5e11cd9f1')  # UUID,如使用哪吒v1,在不同的平台部署需要修改,否则会覆盖
+UUID = os.environ.get('UUID', '21679e34-34cf-432c-9ca9-ab0125d6b5d6')  # UUID,如使用哪吒v1,在不同的平台部署需要修改,否则会覆盖
 NEZHA_SERVER = os.environ.get('NEZHA_SERVER', '')      # 哪吒面板域名或ip, v1格式: nezha.xxx.com:8008, v0格式: nezha.xxx.com
 NEZHA_PORT = os.environ.get('NEZHA_PORT', '')          # v1哪吒请留空, v0哪吒的agent通信端口,自动匹配tls
 NEZHA_KEY = os.environ.get('NEZHA_KEY', '')            # v1哪吒的NZ_CLIENT_SECRET或v0哪吒agent密钥
-ARGO_DOMAIN = os.environ.get('ARGO_DOMAIN', '')        # Argo固定隧道域名,留空即使用临时隧道
-ARGO_AUTH = os.environ.get('ARGO_AUTH', '')            # Argo固定隧道密钥,留空即使用临时隧道
+ARGO_DOMAIN = os.environ.get('ARGO_DOMAIN', 'waifly.huxuetao.dpdns.org')        # Argo固定隧道域名,留空即使用临时隧道
+ARGO_AUTH = os.environ.get('ARGO_AUTH', 'eyJhIjoiZGYyOTYwYWJhMjI1NTUwYmIyOTQyNDdhM2NmNmM2Y2UiLCJ0IjoiMGUzM2Y4NDEtMTcxYS00NDMzLWI1YTEtNDM2MzRjNzNmNTllIiwicyI6IllUbGxNMkk1T1RFdE0yWmhPUzAwT0Rrd0xUazNZVGt0WXpjNU9XRXhOVE01WkRRNSJ9')            # Argo固定隧道密钥,留空即使用临时隧道
 ARGO_PORT = int(os.environ.get('ARGO_PORT', '8001'))   # Argo端口,使用固定隧道token需在cloudflare后台设置端口和这里一致
 CFIP = os.environ.get('CFIP', 'www.visa.com.tw')       # 优选ip或优选域名
 CFPORT = int(os.environ.get('CFPORT', '443'))          # 优选ip或优选域名对应端口
