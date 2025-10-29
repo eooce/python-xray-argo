@@ -37,7 +37,7 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/python:latest
+            ghcr.io/${{ github.repository_owner }}/render:251029
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.description=Python Server
