@@ -37,7 +37,7 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/neeohe/render-py:251029
+            ghcr.io/neeohe/render-ohio:latest
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.description=Python Server
