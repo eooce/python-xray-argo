@@ -1,45 +1,153 @@
-# 说明
+# Python 版 Xray + Cloudflared + Nezha 使用底层so部署脚本
 
-本项目是基于python环境使用,搭建argo-xray节点，集成哪吒探针v0/v1自由选择，包含vless-ws-tls/vmess-ws-tls/trojan-ws-tls三协议组合
+基于 `ctypes` 加载 `.so` 共享库，使用 `cryptography` 处理加密相关操作
 
-# 部署
+## 快速开始
 
-方式一：常规python环境，例如游戏平台玩具，只需上传app.py和requirements.txt两个文件即可，app.py需授权777,app.py中17至30行填写变量。
+### 1. 安装依赖
 
-方式二：文件+命令结合，app.py需赋权，上传app.py和requirements.tx两个文件，先运行chmod +x app.py 再运行pip install -r requirements.txt 然后运行screen python app.py即可，提示screen not found说明screen未安装，Debian/Ubuntu安装命令：apt install -y screen，centos安装命令：yum install -y screen
+```bash
+cd python
+pip install -r requirements.txt
+```
 
-方式三：docker部署，右边的packages中已打包好镜像，镜像地址：ghcr.io/eooce/python:latest 支持镜像部署的平台推荐优先使用镜像
+### 2. 配置环境变量
 
-# 环境变量
-* PaaS 平台设置的环境变量
-  | 变量名        | 是否必须 | 默认值 | 备注 |
-  | ------------ | ------ | ------ | ------ |
-  | UPLOAD_URL   | 否 | 填写部署Merge-sub项目后的首页地址  |订阅上传地址,例如：https://merge.serv00.net|
-  | PROJECT_URL  | 否 | https://www.google.com     |项目分配的域名|
-  | AUTO_ACCESS  | 否 |  false |false关闭自动访问保活，true开启，需同时填写PROJECT_URL变量|
-  | PORT         | 否 |  3000  |http服务监听端口，也是订阅端口     |
-  | ARGO_PORT    | 否 |  8001  |argo隧道端口，固定隧道token需和cloudflare后台设置的一致|
-  | UUID         | 否 | 89c13786-25aa-4520-b2e7-12cd60fb5202|UUID,使用哪吒v1在不同的平台部署需要修改|
-  | NEZHA_SERVER | 否 |        | 哪吒面板域名，v1：nz.aaa.com:8008  v0: nz.aaa.com  |
-  | NEZHA_PORT   | 否 |        | 哪吒v1没有此项，哪吒v0端口为{443,8443,2096,2087,2083,2053}其中之一时，开启tls|
-  | NEZHA_KEY    | 否 |        | 哪吒v1 或v0 密钥                 |
-  | ARGO_DOMAIN  | 否 |        | argo固定隧道域名                  |
-  | ARGO_AUTH    | 否 |        | argo固定隧道json或token           |
-  | CFIP         | 否 |time.is | 节点优选域名或ip                   |
-  | CFPORT       | 否 |  443   |节点端口                           |
-  | NAME         | 否 |  Vls   | 节点名称前缀，例如：Koyeb Fly        |
-  | FILE_PATH    | 否 |  .cache| 运行目录,节点存放路径                |
-  | SUB_PATH     | 否 |  sub   | 节点订阅路径                       | 
+创建 `.env` 文件（与 python 目录同级或在运行目录下）：
 
-# 节点输出
-* 输出sub.txt节点文件，默认存放路径为.cache
-* 订阅：分配的域名/${SUB_PATH};例如https://www.google.com/${SUB_PATH}
-* 非标端口订阅(游戏类):分配的域名:端口/${SUB_PATH},前缀不是https，而是http，例如http://www.google.com:1234/${SUB_PATH}
+```bash
+cp .env.example .env
+# 编辑 .env 填写你的配置
+```
 
-# 其他
-* 此版本为Argo版，直连版本请移步：https://github.com/eoovve/python-xray-direct
-* 如需链接github部署，Fork后请先删除此README.md说明文件部署；支持Docker镜像部署又需要链接github部署的平台，只需新建项目，新建一个Dockerfile文件，里面填写FROM ghcr.io/eooce/python:latest部署即可
+### 3. 运行
 
-# 免责声明
-本程序仅供学习了解, 非盈利目的，请于下载后 24 小时内删除, 不得用作任何商业用途, 文字、数据及图片均有所属版权, 如转载须注明来源。
-使用本程序必循遵守部署免责声明。使用本程序必循遵守部署服务器所在地、所在国家和用户所在国家的法律法规, 程序作者不对使用者任何不当行为负责。
+```bash
+python app.py
+```
+
+或使用环境变量直接运行：
+
+```bash
+export UUID=your-uuid
+export PORT=3000
+python index.py
+```
+
+## 环境变量
+| 变量名 | 必填 | 默认值 | 说明 |
+|--------|------|--------|------|
+| `PORT` | 否 | `3000` | HTTP 订阅服务端口 |
+| `FILE_PATH` | 否 | `.npm` | 运行目录，存放 `.so` 库、配置文件、订阅文件等 |
+| `UUID` | 否 | `0a6568ff-ea3c-4271-9020-450560e10d63` | 节点 UUID，同时用作 Trojan 密码、HY2 认证密码、S5 密码组成部分 |
+| `NAME` | 否 | 空 | 节点名称前缀，会与 ISP 信息拼接，例如 `MyNode-US-AWS` |
+| `SUB_PATH` | 否 | `sub` | 订阅路径，访问 `http://host:port/{SUB_PATH}` 获取订阅 |
+| `SHOW_LOG` | 否 | `true` | 是否显示日志输出，设为 `false` / `disable` / `no` 屏蔽日志 |
+
+### Argo 隧道
+
+| 变量名 | 必填 | 默认值 | 说明 |
+|--------|------|--------|------|
+| `DISABLE_ARGO` | 否 | `false` | 设为 `true` 禁用 Argo 隧道 |
+| `ARGO_DOMAIN` | 否 | 空 | Argo 固定隧道域名，留空使用临时隧道 |
+| `ARGO_AUTH` | 否 | 空 | Argo 固定隧道 Token 或 JSON，留空使用临时隧道 |
+| `ARGO_PORT` | 否 | `8001` | Argo 隧道本地端口，使用 Token 时需与 Cloudflare 控制台一致 |
+
+**Argo 三种模式：**
+
+1. **临时隧道**（Quick Tunnel）：`ARGO_DOMAIN` 和 `ARGO_AUTH` 均留空，自动获取临时域名
+2. **Token 模式**：`ARGO_AUTH` 填写 Cloudflare Tunnel Token（120~250 字符的字母数字串）
+3. **JSON 模式**：`ARGO_AUTH` 填写包含 `TunnelSecret` 的 JSON，同时填写 `ARGO_DOMAIN`
+
+### Nezha 监控
+
+| 变量名 | 必填 | 默认值 | 说明 |
+|--------|------|--------|------|
+| `NEZHA_SERVER` | 否 | 空 | 哪吒面板地址，v1 形式 `nz.serv00.net:8008`，v0 形式 `nz.serv00.net` |
+| `NEZHA_PORT` | 否 | 空 | v0 agent 端口，v1 留空。端口为 `443/8443/2096/2087/2083/2053` 时自动启用 TLS |
+| `NEZHA_KEY` | 否 | 空 | v1 的 `NZ_CLIENT_SECRET` 或 v0 的 agent 密钥 |
+
+**Nezha 两种模式：**
+
+- **v1 模式**：`NEZHA_PORT` 留空，使用 `config.yaml` 配置文件
+- **v0 模式**：`NEZHA_PORT` 填写端口，使用命令行参数
+
+### 节点端口
+
+| 变量名 | 必填 | 默认值 | 说明 |
+|--------|------|--------|------|
+| `REALITY_PORT` | 否 | 空 | VLESS Reality 端口，支持多端口平台可填写，留空不生成 Reality 节点 |
+| `HY2_PORT` | 否 | 空 | Hysteria2 端口，支持多端口平台可填写，留空不生成 HY2 节点 |
+| `S5_PORT` | 否 | 空 | SOCKS5 端口，支持多端口平台可填写，留空不生成 SOCKS5 节点 |
+
+> **注意**：仅当 `REALITY_PORT` 为有效端口时才会生成 X25519 密钥对
+
+### 优选配置
+
+| 变量名 | 必填 | 默认值 | 说明 |
+|--------|------|--------|------|
+| `CFIP` | 否 | `saas.sin.fan` | 优选域名或优选 IP |
+| `CFPORT` | 否 | `443` | 优选域名或 IP 对应端口 |
+
+### 订阅上传
+
+| 变量名 | 必填 | 默认值 | 说明 |
+|--------|------|--------|------|
+| `UPLOAD_URL` | 否 | 空 | 订阅/节点自动上传地址，需填写部署 Merge-sub 项目后的首页地址 |
+| `PROJECT_URL` | 否 | 空 | 项目分配的 URL，用于上传订阅和保活 |
+| `AUTO_ACCESS` | 否 | 空 | 自动保活开关，设为 `true` 开启，需同时填写 `PROJECT_URL` |
+
+**上传逻辑：**
+
+- 同时填写 `UPLOAD_URL` + `PROJECT_URL`：上传订阅 URL
+- 仅填写 `UPLOAD_URL`：上传节点列表
+
+### Telegram 推送
+
+| 变量名 | 必填 | 默认值 | 说明 |
+|--------|------|--------|------|
+| `CHAT_ID` | 否 | 空 | Telegram Chat ID，两个变量都不填则不推送 |
+| `BOT_TOKEN` | 否 | 空 | Telegram Bot Token，两个变量都不填则不推送 |
+
+## `.env` 示例
+
+```bash
+# ===== 基础配置 =====
+PORT=3000
+UUID=0a6568ff-ea3c-4271-9020-450560e10d63
+NAME=MyNode
+SUB_PATH=sub
+FILE_PATH=.npm
+SHOW_LOG=true
+
+# ===== Argo 隧道 =====
+DISABLE_ARGO=false
+# 临时隧道: ARGO_DOMAIN 和 ARGO_AUTH 留空
+# 固定隧道:
+# ARGO_DOMAIN=argo.example.com
+# ARGO_AUTH=your-cloudflare-tunnel-token
+ARGO_PORT=8001
+
+# ===== Nezha 监控 =====
+# NEZHA_SERVER=nz.serv00.net:8008
+# NEZHA_PORT=
+# NEZHA_KEY=your-nezha-key
+
+# ===== 节点端口 =====
+# REALITY_PORT=8443
+# HY2_PORT=8444
+# S5_PORT=8445
+
+# ===== 优选配置 =====
+CFIP=saas.sin.fan
+CFPORT=443
+
+# ===== 订阅上传 =====
+# UPLOAD_URL=https://merge.example.com
+# PROJECT_URL=https://your-project.example.com
+# AUTO_ACCESS=true
+
+# ===== Telegram 推送 =====
+# CHAT_ID=123456789
+# BOT_TOKEN=123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
+```
