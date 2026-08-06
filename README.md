@@ -23,14 +23,21 @@
   | NEZHA_SERVER | 否 |        | 哪吒面板域名，v1：nz.aaa.com:8008  v0: nz.aaa.com  |
   | NEZHA_PORT   | 否 |        | 哪吒v1没有此项，哪吒v0端口为{443,8443,2096,2087,2083,2053}其中之一时，开启tls|
   | NEZHA_KEY    | 否 |        | 哪吒v1 或v0 密钥                 |
-  | ARGO_DOMAIN  | 否 |        | argo固定隧道域名                  |
+  | ARGO_DOMAIN  | 否 |        | argo固定隧道域名，留空使用临时隧道 |
   | ARGO_AUTH    | 否 |        | argo固定隧道json或token           |
+  | S5_PORT      | 否 |        |socks5端口，填写开启                |
+  | HY2_PORT     | 否 |        |hysteria2协议端口，填写开启         |
+  | REALITY_PORT | 否 |        |reality协议端口，填写开启           |
   | CFIP         | 否 |time.is | 节点优选域名或ip                   |
   | CFPORT       | 否 |  443   |节点端口                           |
-  | NAME         | 否 |  Vls   | 节点名称前缀，例如：Koyeb Fly        |
+  | NAME         | 否 |        | 节点名称前缀，例如：Koyeb Fly        |
   | FILE_PATH    | 否 |  .cache| 运行目录,节点存放路径                |
   | SUB_PATH     | 否 |  sub   | 节点订阅路径                       | 
+  | CHAT_ID      | 否 |        | 节点推送到telegram，需同时填写bot token|
+  | BOT_TOKEN    | 否 |        | 节点推送到telegram，需同时填写caht id|
+  | SHOW_LOG     | 否 |  yes   | 是否显示日志，默认显示，no/false/disable屏蔽|
 
+  
 # 节点输出
 * 输出sub.txt节点文件，默认存放路径为.cache
 * 订阅：分配的域名/${SUB_PATH};例如https://www.google.com/${SUB_PATH}
