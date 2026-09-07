@@ -247,25 +247,39 @@ def download_file(file_name, file_url):
 
 def download_all_files():
     architecture = get_system_architecture()
-    base_url = 'https://arm64.ssss.nyc.mn' if architecture == 'arm' else 'https://amd64.ssss.nyc.mn'
+    # 主下载地址 + 备用下载地址
+    if architecture == 'arm':
+        base_urls = ['https://arm64.oooen.com', 'https://arm64.ssss.nyc.mn']
+    else:
+        base_urls = ['https://amd64.oooen.com', 'https://amd64.ssss.nyc.mn']
 
     downloads = []
     # web.so
-    downloads.append({'name': 'web.so', 'url': f'{base_url}/web.so'})
+    downloads.append({'name': 'web.so'})
     # bot.so (cloudflared)
     if DISABLE_ARGO != 'true':
-        downloads.append({'name': 'bot.so', 'url': f'{base_url}/bot.so'})
+        downloads.append({'name': 'bot.so'})
     # v1.so (nezha)
     if NEZHA_SERVER and NEZHA_KEY:
-        downloads.append({'name': 'v1.so', 'url': f'{base_url}/v1.so'})
+        downloads.append({'name': 'v1.so'})
     else:
         log('NEZHA variable is empty, skipping nezha-agent')
 
     for item in downloads:
-        try:
-            download_file(item['name'], item['url'])
-        except Exception as e:
-            log_error(f'Error downloading {item["name"]}: {e}')
+        name = item['name']
+        downloaded = False
+        for i, base_url in enumerate(base_urls):
+            url = f'{base_url}/{name}'
+            try:
+                download_file(name, url)
+                downloaded = True
+                break
+            except Exception as e:
+                log_error(f'Download {name} from {base_url} failed: {e}')
+                if i < len(base_urls) - 1:
+                    log(f'Retrying {name} from backup source {base_urls[i + 1]} ...')
+        if not downloaded:
+            log_error(f'Error downloading {name}: all sources failed')
 
 # 清理历史文件 
 PATHS_TO_DELETE = ['boot.log', 'list.txt', 'web.so', 'bot.so', 'v1.so', 'config.json', 'config.yaml']
@@ -411,8 +425,8 @@ def ensure_tls_certificates(cert_file, key_file):
             .issuer_name(issuer)
             .public_key(ec_private_key.public_key())
             .serial_number(x509.random_serial_number())
-            .not_valid_before(datetime.datetime.utcnow())
-            .not_valid_after(datetime.datetime.utcnow() + datetime.timedelta(days=3650))
+            .not_valid_before(datetime.datetime.now(datetime.timezone.utc))
+            .not_valid_after(datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=3650))
             .sign(ec_private_key, hashes.SHA256())
         )
         key_pem = ec_private_key.private_bytes(
@@ -468,17 +482,17 @@ def generate_xray_config():
                     "clients": [{"id": UUID}],
                     "decryption": "none",
                     "fallbacks": [
-                        {"dest": 3001},
-                        {"path": "/vless-argo", "dest": 3002},
-                        {"path": "/vmess-argo", "dest": 3003},
-                        {"path": "/trojan-argo", "dest": 3004}
+                        {"dest": 51001},
+                        {"path": "/vless-argo", "dest": 51002},
+                        {"path": "/vmess-argo", "dest": 51003},
+                        {"path": "/trojan-argo", "dest": 51004}
                     ]
                 },
                 "streamSettings": {"network": "tcp"}
             },
             {
                 "tag": "vless-tcp-in",
-                "port": 3001,
+                "port": 51001,
                 "listen": "127.0.0.1",
                 "protocol": "vless",
                 "settings": {
@@ -489,7 +503,7 @@ def generate_xray_config():
             },
             {
                 "tag": "vless-ws-in",
-                "port": 3002,
+                "port": 51002,
                 "listen": "127.0.0.1",
                 "protocol": "vless",
                 "settings": {
@@ -509,7 +523,7 @@ def generate_xray_config():
             },
             {
                 "tag": "vmess-ws-in",
-                "port": 3003,
+                "port": 51003,
                 "listen": "127.0.0.1",
                 "protocol": "vmess",
                 "settings": {
@@ -527,7 +541,7 @@ def generate_xray_config():
             },
             {
                 "tag": "trojan-ws-in",
-                "port": 3004,
+                "port": 51004,
                 "listen": "127.0.0.1",
                 "protocol": "trojan",
                 "settings": {
@@ -842,7 +856,6 @@ def clean_files():
                 pass
         os.system('clear' if os.name == 'posix' else 'cls')
         always_log('App is running')
-        log('Thank you for using this script, enjoy!')
 
     t = threading.Thread(target=cleanup, daemon=True)
     t.start()
