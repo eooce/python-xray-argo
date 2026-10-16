@@ -732,7 +732,7 @@ def generate_links(argo_domain):
     # 只有当 DISABLE_ARGO 不为 'true' 且 argoDomain 存在时才生成 Argo 节点
     if DISABLE_ARGO != 'true' and argo_domain:
         # VLESS 节点
-        sub_txt += f'\nvless://{UUID}@{CFIP}:{CFPORT}?encryption=none&security=tls&sni={argo_domain}&type=ws&host={argo_domain}&path=/vless-argo#{node_name}'
+        sub_txt += f'\nvless://{UUID}@{CFIP}:{CFPORT}?encryption=none&security=tls&sni={argo_domain}&type=ws&host={argo_domain}&path=/vless-argo%3Fed%3D2560#{node_name}'
 
         # VMess 节点
         vmess_obj = {
@@ -745,7 +745,7 @@ def generate_links(argo_domain):
         sub_txt += f'\nvmess://{vmess_b64}'
 
         # Trojan 节点
-        sub_txt += f'\ntrojan://{UUID}@{CFIP}:{CFPORT}?security=tls&sni={argo_domain}&type=ws&host={argo_domain}&path=/trojan-argo#{node_name}'
+        sub_txt += f'\ntrojan://{UUID}@{CFIP}:{CFPORT}?security=tls&sni={argo_domain}&type=ws&host={argo_domain}&path=/trojan-argo%3Fed%3D2560#{node_name}'
 
     # HY2_PORT 是有效端口号时生成 hysteria2 节点
     if is_valid_port(HY2_PORT):
